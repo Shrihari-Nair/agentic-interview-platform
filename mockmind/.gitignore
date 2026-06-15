@@ -1,0 +1,67 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+*.so
+.Python
+env/
+venv/
+.venv/
+ENV/
+.env
+!.env.example
+
+# Node / Next.js
+node_modules/
+.next/
+out/
+.DS_Store
+*.tsbuildinfo
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Frontend env (keep example, ignore real ones)
+frontend/.env.local
+frontend/.env
+frontend/.env*.local
+!frontend/.env.local.example
+
+# LiveKit / secrets
+*.pem
+*.key
+*.cert
+
+# Redis dump
+dump.rdb
+
+# IDE / OS
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Docker volumes / data
+data/
+postgres-data/
+
+# Coverage / tests
+.coverage
+htmlcov/
+.pytest_cache/
+coverage.xml
+*.lcov
+
+# Logs
+*.log
+logs/
