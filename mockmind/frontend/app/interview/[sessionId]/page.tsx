@@ -9,8 +9,10 @@ import {
   useRoomContext,
 } from '@livekit/components-react';
 import '@livekit/components-styles';
+import { Mic, CheckCircle2 } from 'lucide-react';
 import { getSessionToken } from '../../../lib/api';
 import type { SessionTokenData } from '../../../types/interview';
+import { AuroraBackground } from '../../../components/AuroraBackground';
 
 export default function InterviewPage() {
   const { sessionId } = useParams() as { sessionId: string };
@@ -36,9 +38,10 @@ export default function InterviewPage() {
 
   if (!tokenData) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-slate-900 text-slate-400">
-        <div className="text-center space-y-3">
-          <div className="text-4xl animate-pulse">🎙️</div>
+      <div className="relative flex items-center justify-center min-h-screen bg-slate-900 text-slate-400 overflow-hidden">
+        <AuroraBackground subtle />
+        <div className="relative z-10 text-center space-y-3">
+          <Mic className="w-10 h-10 mx-auto animate-pulse text-blue-400" />
           <p>Connecting to interview room...</p>
         </div>
       </div>
@@ -235,17 +238,10 @@ function VoiceOrb({ state }: { state: OrbState }) {
 
         {/* Microphone icon for listening state */}
         {isListening && (
-          <div
-            style={{
-              position: 'absolute',
-              zIndex: 2,
-              color: 'rgba(255,255,255,0.85)',
-              fontSize: 40,
-              pointerEvents: 'none',
-            }}
-          >
-            🎤
-          </div>
+          <Mic
+            style={{ position: 'absolute', zIndex: 2, pointerEvents: 'none' }}
+            className="w-10 h-10 text-white/85"
+          />
         )}
       </div>
     </>
@@ -278,11 +274,13 @@ function InterviewRoomUI({ sessionId }: { sessionId: string }) {
   };
 
   return (
-    <div className="min-h-screen bg-slate-900 text-white flex flex-col">
+    <div className="relative min-h-screen bg-slate-900 text-white flex flex-col overflow-hidden">
+      <AuroraBackground subtle />
+
       {/* Header */}
-      <header className="flex items-center justify-between px-6 py-4 border-b border-slate-700/60">
+      <header className="relative z-10 flex items-center justify-between px-6 py-4 border-b border-white/10">
         <div>
-          <h1 className="text-xl font-bold tracking-tight">MockMind</h1>
+          <h1 className="font-display text-xl font-bold tracking-tight">MockMind</h1>
           <p className="text-slate-500 text-xs mt-0.5">
             Session · {sessionId.slice(0, 8)}
           </p>
@@ -300,7 +298,7 @@ function InterviewRoomUI({ sessionId }: { sessionId: string }) {
           <button
             onClick={handleEndInterview}
             disabled={isEnded}
-            className="px-4 py-2 bg-red-600 hover:bg-red-700 disabled:opacity-50 rounded-xl text-sm font-semibold transition-colors"
+            className="px-4 py-2 bg-red-600 hover:bg-red-500 disabled:opacity-50 rounded-xl text-sm font-semibold transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] shadow-lg shadow-red-600/20"
           >
             End Interview
           </button>
@@ -308,11 +306,11 @@ function InterviewRoomUI({ sessionId }: { sessionId: string }) {
       </header>
 
       {/* Main — orb centred */}
-      <div className="flex-1 flex flex-col items-center justify-center gap-8 p-8">
+      <div className="relative z-10 flex-1 flex flex-col items-center justify-center gap-8 p-8">
         <VoiceOrb state={orbState} />
 
         <div className="text-center space-y-2">
-          <h2 className="text-2xl font-bold">{cfg.label}</h2>
+          <h2 className="font-display text-2xl font-bold">{cfg.label}</h2>
           <p className="text-slate-400">{cfg.sublabel}</p>
           {orbState === 'listening' && (
             <p className="text-slate-500 text-sm mt-1">
@@ -325,14 +323,14 @@ function InterviewRoomUI({ sessionId }: { sessionId: string }) {
       {/* End overlay */}
       {isEnded && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50">
-          <div className="bg-white rounded-3xl p-10 text-gray-800 text-center max-w-sm mx-4 shadow-2xl">
-            <div className="text-6xl mb-4">✅</div>
-            <h2 className="text-2xl font-bold mb-2">Interview Complete!</h2>
-            <p className="text-gray-500">
+          <div className="bg-slate-900/90 backdrop-blur-xl border border-white/10 rounded-3xl p-10 text-white text-center max-w-sm mx-4 shadow-2xl animate-fade-in-up">
+            <CheckCircle2 className="w-14 h-14 text-emerald-400 mx-auto mb-4" />
+            <h2 className="font-display text-2xl font-bold mb-2">Interview Complete!</h2>
+            <p className="text-slate-400">
               Generating your evaluation report...
             </p>
-            <div className="mt-4 h-1.5 bg-gray-200 rounded-full overflow-hidden">
-              <div className="h-full bg-green-500 rounded-full animate-pulse w-3/4" />
+            <div className="mt-4 h-1.5 bg-white/10 rounded-full overflow-hidden">
+              <div className="h-full bg-gradient-to-r from-emerald-500 to-green-400 rounded-full animate-pulse w-3/4 shadow-[0_0_12px_0_rgba(52,211,153,0.6)]" />
             </div>
           </div>
         </div>

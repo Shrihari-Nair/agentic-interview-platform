@@ -4,6 +4,16 @@ MockMind is an AI-powered voice mock-interview platform. A candidate uploads the
 
 The application lives in [`mockmind/`](mockmind); this repo also contains the original design spec, [`MOCK_INTERVIEW_PLATFORM.md`](MOCK_INTERVIEW_PLATFORM.md).
 
+## Screenshots
+
+| Landing page | Setup — preparing the interview |
+|---|---|
+| ![Landing page](images/home_screen.png) | ![Resume upload and live preparation progress](images/resume_page.png) |
+
+| Generating the evaluation report |
+|---|
+| ![Generating the evaluation report](images/report_generation.png) |
+
 ## How it works
 
 1. **Setup** — The candidate uploads a resume and pastes a job description. The backend runs three Gemini-based sub-agents in sequence (resume analysis → job description analysis → question generation) and streams progress to the frontend over SSE. The resulting interview plan is stored in Redis.

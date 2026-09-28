@@ -2,15 +2,28 @@
 
 import { useState, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import {
+  FileText,
+  FileSearch,
+  Target,
+  PenLine,
+  CheckCircle2,
+  XCircle,
+  UploadCloud,
+  Loader2,
+  Mic,
+  type LucideIcon,
+} from 'lucide-react';
 import { usePreparation } from '../../hooks/usePreparation';
+import { AuroraBackground } from '../../components/AuroraBackground';
 
-const STAGE_LABELS: Record<string, string> = {
-  parsing: '📄 Parsing resume',
-  resume_analysis: '🔍 Analyzing background',
-  jd_analysis: '🎯 Analyzing job requirements',
-  question_gen: '✏️ Crafting questions',
-  complete: '✅ Ready',
-  error: '❌ Error',
+const STAGE_CONFIG: Record<string, { icon: LucideIcon; label: string }> = {
+  parsing: { icon: FileText, label: 'Parsing resume' },
+  resume_analysis: { icon: FileSearch, label: 'Analyzing background' },
+  jd_analysis: { icon: Target, label: 'Analyzing job requirements' },
+  question_gen: { icon: PenLine, label: 'Crafting questions' },
+  complete: { icon: CheckCircle2, label: 'Ready' },
+  error: { icon: XCircle, label: 'Error' },
 };
 
 export default function SetupPage() {
@@ -43,28 +56,35 @@ export default function SetupPage() {
     !!resumeFile && jobDescription.trim().length > 50 && !isRunning;
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 flex items-center justify-center p-6">
-      <div className="w-full max-w-2xl">
+    <main className="relative min-h-screen overflow-hidden flex items-center justify-center p-6">
+      <AuroraBackground subtle />
+
+      <div className="relative z-10 w-full max-w-2xl">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-black text-white">MockMind</h1>
+        <div className="text-center mb-8 animate-fade-in-up">
+          <h1 className="font-display text-4xl font-bold bg-gradient-to-r from-blue-400 via-cyan-300 to-blue-400 bg-clip-text text-transparent">
+            MockMind
+          </h1>
           <p className="text-slate-400 mt-2">
             AI-powered mock interviews, personalized to your resume.
           </p>
         </div>
 
-        <div className="bg-white rounded-3xl shadow-2xl p-8 space-y-6">
+        <div
+          className="bg-white/5 backdrop-blur-2xl border border-white/10 rounded-3xl shadow-2xl shadow-black/40 p-8 space-y-6 animate-fade-in-up"
+          style={{ animationDelay: '0.1s' }}
+        >
           {/* Resume Upload */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label className="block text-sm font-semibold text-slate-300 mb-2">
               Your Resume
             </label>
             <div
               onClick={() => fileInputRef.current?.click()}
-              className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-colors ${
+              className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all duration-300 ${
                 resumeFile
-                  ? 'border-green-400 bg-green-50'
-                  : 'border-gray-300 hover:border-blue-400 hover:bg-blue-50'
+                  ? 'border-emerald-400/50 bg-emerald-500/10'
+                  : 'border-white/15 hover:border-blue-400/50 hover:bg-blue-500/5'
               }`}
             >
               <input
@@ -76,20 +96,21 @@ export default function SetupPage() {
               />
               {resumeFile ? (
                 <div>
-                  <p className="text-green-700 font-semibold">
-                    ✅ {resumeFile.name}
+                  <CheckCircle2 className="w-7 h-7 text-emerald-400 mx-auto mb-2" />
+                  <p className="text-emerald-300 font-semibold">
+                    {resumeFile.name}
                   </p>
-                  <p className="text-green-600 text-sm mt-1">
+                  <p className="text-emerald-400/70 text-sm mt-1">
                     {(resumeFile.size / 1024).toFixed(0)} KB · Click to change
                   </p>
                 </div>
               ) : (
                 <div>
-                  <p className="text-3xl mb-2">📎</p>
-                  <p className="text-gray-600 font-medium">
+                  <UploadCloud className="w-8 h-8 text-slate-400 mx-auto mb-2" />
+                  <p className="text-slate-300 font-medium">
                     Drop your resume here or click to browse
                   </p>
-                  <p className="text-xs text-gray-400 mt-1">
+                  <p className="text-xs text-slate-500 mt-1">
                     PDF, DOCX, or TXT
                   </p>
                 </div>
@@ -99,7 +120,7 @@ export default function SetupPage() {
 
           {/* Job Description */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-2">
+            <label className="block text-sm font-semibold text-slate-300 mb-2">
               Job Description
             </label>
             <textarea
@@ -107,13 +128,13 @@ export default function SetupPage() {
               onChange={(e) => setJobDescription(e.target.value)}
               placeholder="Paste the full job description here — include requirements, responsibilities, and company details for the most personalized interview."
               rows={8}
-              className="w-full border-2 border-gray-200 rounded-xl p-4 text-sm focus:border-blue-400 outline-none resize-none text-gray-800 transition-colors"
+              className="w-full bg-white/5 border border-white/10 rounded-xl p-4 text-sm text-white placeholder:text-slate-500 focus:border-blue-400/50 outline-none resize-none transition-colors"
               disabled={isRunning}
             />
-            <p className="text-xs text-gray-400 mt-1">
+            <p className="text-xs text-slate-500 mt-1">
               {jobDescription.length} characters
               {jobDescription.length < 50 && jobDescription.length > 0 && (
-                <span className="text-amber-500 ml-2">
+                <span className="text-amber-400 ml-2">
                   (paste a longer job description for best results)
                 </span>
               )}
@@ -122,50 +143,54 @@ export default function SetupPage() {
 
           {/* Preparation Progress */}
           {(isRunning || events.length > 0) && !error && (
-            <div className="bg-slate-50 rounded-xl p-4 space-y-3">
+            <div className="bg-white/5 border border-white/10 rounded-xl p-4 space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-gray-700">
+                <span className="text-sm font-semibold text-slate-300">
                   {isRunning ? 'Preparing your interview...' : 'Preparation complete'}
                 </span>
-                <span className="text-sm font-bold text-blue-600">
+                <span className="text-sm font-bold text-cyan-300">
                   {currentProgress}%
                 </span>
               </div>
               {/* Progress bar */}
-              <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+              <div className="h-2 bg-white/10 rounded-full overflow-hidden">
                 <div
-                  className="h-full bg-blue-500 rounded-full transition-all duration-700"
+                  className="h-full bg-gradient-to-r from-blue-500 to-cyan-400 rounded-full transition-all duration-700 shadow-[0_0_12px_0_rgba(56,189,248,0.6)]"
                   style={{ width: `${currentProgress}%` }}
                 />
               </div>
               {/* Stage log */}
               <div className="space-y-1.5 max-h-36 overflow-y-auto pr-1">
-                {events.map((event, i) => (
-                  <div
-                    key={i}
-                    className="flex items-start gap-2 text-xs text-gray-600"
-                  >
-                    <span className="shrink-0 mt-0.5">
-                      {STAGE_LABELS[event.stage]?.split(' ')[0] ?? '⟳'}
-                    </span>
-                    <span>{event.message}</span>
-                  </div>
-                ))}
+                {events.map((event, i) => {
+                  const cfg = STAGE_CONFIG[event.stage];
+                  const Icon = cfg?.icon ?? Loader2;
+                  return (
+                    <div
+                      key={i}
+                      className="flex items-start gap-2 text-xs text-slate-400"
+                    >
+                      <Icon className="w-3.5 h-3.5 shrink-0 mt-0.5 text-slate-500" />
+                      <span>{event.message}</span>
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}
 
           {/* Error */}
           {error && (
-            <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-red-700 text-sm">
-              <p className="font-semibold">Preparation failed</p>
+            <div className="bg-red-500/10 border border-red-500/30 rounded-xl p-4 text-red-300 text-sm">
+              <p className="font-semibold flex items-center gap-1.5">
+                <XCircle className="w-4 h-4" /> Preparation failed
+              </p>
               <p className="mt-1">{error}</p>
               <button
                 onClick={() => {
                   setResumeFile(null);
                   setJobDescription('');
                 }}
-                className="mt-2 text-red-600 underline text-xs"
+                className="mt-2 text-red-300 underline text-xs hover:text-red-200"
               >
                 Start over
               </button>
@@ -174,14 +199,14 @@ export default function SetupPage() {
 
           {/* Session Ready Banner */}
           {isReady && sessionInfo && (
-            <div className="bg-green-50 border border-green-200 rounded-xl p-4">
-              <p className="text-green-800 font-semibold">
-                ✅ Interview ready — {sessionInfo.totalQuestions} personalized
-                questions for{' '}
+            <div className="bg-emerald-500/10 border border-emerald-500/30 rounded-xl p-4">
+              <p className="text-emerald-300 font-semibold flex items-center gap-1.5">
+                <CheckCircle2 className="w-4 h-4 shrink-0" /> Interview ready
+                — {sessionInfo.totalQuestions} personalized questions for{' '}
                 <span className="italic">{sessionInfo.jobTitle}</span>
               </p>
               {sessionInfo.candidateName && (
-                <p className="text-green-700 text-sm mt-1">
+                <p className="text-emerald-400/80 text-sm mt-1">
                   Candidate: {sessionInfo.candidateName}
                 </p>
               )}
@@ -193,11 +218,11 @@ export default function SetupPage() {
             <button
               onClick={handleStart}
               disabled={!canSubmit}
-              className="w-full py-4 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold text-lg rounded-xl transition-colors"
+              className="w-full py-4 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 disabled:from-white/10 disabled:to-white/10 disabled:text-slate-500 disabled:shadow-none disabled:cursor-not-allowed disabled:hover:scale-100 text-white font-bold text-lg rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] shadow-xl shadow-blue-600/20"
             >
               {isRunning ? (
                 <span className="flex items-center justify-center gap-2">
-                  <span className="animate-spin">⟳</span> Preparing...
+                  <Loader2 className="w-5 h-5 animate-spin" /> Preparing...
                 </span>
               ) : (
                 'Prepare My Interview'
@@ -206,9 +231,9 @@ export default function SetupPage() {
           ) : (
             <button
               onClick={handleBeginInterview}
-              className="w-full py-4 bg-green-600 hover:bg-green-700 text-white font-bold text-xl rounded-xl transition-colors shadow-lg shadow-green-600/20"
+              className="w-full py-4 bg-gradient-to-r from-emerald-500 to-green-400 hover:from-emerald-400 hover:to-green-300 text-white font-bold text-xl rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] shadow-xl shadow-emerald-600/20 flex items-center justify-center gap-2"
             >
-              🎙️ Start Interview
+              <Mic className="w-5 h-5" /> Start Interview
             </button>
           )}
         </div>
