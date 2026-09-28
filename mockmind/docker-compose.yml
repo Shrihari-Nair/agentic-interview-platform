@@ -44,3 +44,15 @@ services:
       - .:/app
     working_dir: /app
     command: python agent/agent.py start
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_LIVEKIT_URL: ${LIVEKIT_URL}
+        NEXT_PUBLIC_BACKEND_URL: http://localhost:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
