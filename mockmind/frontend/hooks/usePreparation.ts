@@ -13,7 +13,12 @@ export function usePreparation() {
   const abortRef = useRef<AbortController | null>(null);
 
   const startPreparation = useCallback(
-    async (resumeFile: File, jobDescription: string) => {
+    async (
+      resumeFile: File,
+      jobDescription: string,
+      useMemory: boolean = false,
+      candidateEmail: string = '',
+    ) => {
       setIsRunning(true);
       setEvents([]);
       setError(null);
@@ -23,6 +28,10 @@ export function usePreparation() {
       const formData = new FormData();
       formData.append('resume', resumeFile);
       formData.append('job_description', jobDescription);
+      formData.append('use_memory', String(useMemory));
+      if (useMemory && candidateEmail.trim()) {
+        formData.append('candidate_email', candidateEmail.trim());
+      }
 
       abortRef.current = new AbortController();
 

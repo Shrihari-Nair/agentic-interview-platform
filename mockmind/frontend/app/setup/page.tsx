@@ -31,6 +31,8 @@ export default function SetupPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [jobDescription, setJobDescription] = useState('');
+  const [useMemory, setUseMemory] = useState(false);
+  const [candidateEmail, setCandidateEmail] = useState('');
   const {
     events,
     currentProgress,
@@ -42,7 +44,7 @@ export default function SetupPage() {
 
   const handleStart = async () => {
     if (!resumeFile || !jobDescription.trim()) return;
-    await startPreparation(resumeFile, jobDescription);
+    await startPreparation(resumeFile, jobDescription, useMemory, candidateEmail);
   };
 
   const handleBeginInterview = () => {
@@ -139,6 +141,33 @@ export default function SetupPage() {
                 </span>
               )}
             </p>
+          </div>
+
+          {/* Cross-session memory opt-in */}
+          <div className="bg-white/5 border border-white/10 rounded-xl p-4 space-y-3">
+            <label className="flex items-start gap-2.5 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={useMemory}
+                onChange={(e) => setUseMemory(e.target.checked)}
+                disabled={isRunning}
+                className="mt-0.5 w-4 h-4 rounded border-white/20 bg-white/5 accent-blue-500"
+              />
+              <span className="text-sm text-slate-300">
+                Remember my performance across sessions — future interviews
+                will focus more on areas I&apos;ve historically struggled with.
+              </span>
+            </label>
+            {useMemory && (
+              <input
+                type="email"
+                value={candidateEmail}
+                onChange={(e) => setCandidateEmail(e.target.value)}
+                placeholder="your@email.com"
+                disabled={isRunning}
+                className="w-full bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder:text-slate-500 focus:border-blue-400/50 outline-none transition-colors"
+              />
+            )}
           </div>
 
           {/* Preparation Progress */}
