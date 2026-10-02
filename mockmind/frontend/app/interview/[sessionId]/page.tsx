@@ -1,10 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import {
   LiveKitRoom,
   RoomAudioRenderer,
+  useDataChannel,
   useVoiceAssistant,
   useRoomContext,
 } from '@livekit/components-react';
@@ -13,6 +14,7 @@ import { Mic, CheckCircle2 } from 'lucide-react';
 import { getSessionToken } from '../../../lib/api';
 import type { SessionTokenData } from '../../../types/interview';
 import { AuroraBackground } from '../../../components/AuroraBackground';
+import { CodeEditorPanel, type CodingChallenge } from '../../../components/CodeEditorPanel';
 
 export default function InterviewPage() {
   const { sessionId } = useParams() as { sessionId: string };
@@ -255,6 +257,33 @@ function InterviewRoomUI({ sessionId }: { sessionId: string }) {
   const room = useRoomContext();
   const router = useRouter();
   const [isEnded, setIsEnded] = useState(false);
+  const [challenge, setChallenge] = useState<CodingChallenge | null>(null);
+
+  useDataChannel('coding_challenge', (msg) => {
+    try {
+      const payload = JSON.parse(new TextDecoder().decode(msg.payload));
+      if (payload.type === 'show_editor') {
+        setChallenge(payload as CodingChallenge);
+      }
+    } catch {
+      // ignore malformed data messages
+    }
+  });
+
+  const { send: sendCodeSubmission } = useDataChannel('code_submission');
+
+  const handleSubmitCode = useCallback(
+    (code: string) => {
+      if (!challenge) return;
+      const payload = JSON.stringify({ question_id: challenge.question_id, code });
+      sendCodeSubmission(new TextEncoder().encode(payload), { reliable: true });
+      // Hide the editor once submitted — Alex reacts out loud next (the
+      // voice orb's "thinking" state covers the review time), same as any
+      // other answer. Agent sends a fresh "show_editor" for the next one.
+      setChallenge(null);
+    },
+    [challenge, sendCodeSubmission],
+  );
 
   const orbState: OrbState =
     agentState === 'speaking' ||
@@ -319,6 +348,9 @@ function InterviewRoomUI({ sessionId }: { sessionId: string }) {
           )}
         </div>
       </div>
+
+      {/* Live coding editor */}
+      {challenge && <CodeEditorPanel challenge={challenge} onSubmit={handleSubmitCode} />}
 
       {/* End overlay */}
       {isEnded && (

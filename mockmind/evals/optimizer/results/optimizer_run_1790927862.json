@@ -1,0 +1,610 @@
+{
+  "persona": "vague",
+  "baseline_score": 7,
+  "best_score": 7,
+  "max_score": 7,
+  "promoted": false,
+  "rounds_run": 0,
+  "history": [
+    {
+      "version": 0,
+      "score": 7,
+      "result": {
+        "session_id": "optimizer-baseline-vague-e608b2df",
+        "persona": "vague",
+        "transcript": [
+          {
+            "speaker": "interviewer",
+            "text": "Hi Priya, I'm Alex, your AI interviewer for today. I'm looking forward to learning more about your experience and how it aligns with the AI Engineer role at TechNova Solutions. Priya, your resume highlights a 'FastAPI microservice for resume parsing and structured data extraction.' Can you tell me more about the core problem this service aimed to solve and your specific contributions to its design and implementation?",
+            "timestamp": 1790927658.5388875,
+            "question_index": 0
+          },
+          {
+            "speaker": "candidate",
+            "text": "Um, yeah, the FastAPI microservice. I guess the core problem it aimed to solve was, like, making it easier to, you know, get information out of resumes. Like, instead of someone having to read through all of them, the service would, uh, just sort of pull out the important bits.\n\nMy specific contributions? Well, I, um, I worked on some of the backend stuff. And, you know, getting it to, like, process the resumes.",
+            "timestamp": 1790927661.3385108,
+            "question_index": 0
+          },
+          {
+            "speaker": "interviewer",
+            "text": "Thanks for that overview, Priya. What specific techniques or libraries did you use for the actual parsing and extraction logic?",
+            "timestamp": 1790927663.6281805,
+            "question_index": 0
+          },
+          {
+            "speaker": "candidate",
+            "text": "Uh, for the parsing and extraction... we used some, like, standard libraries. You know, just, um, general Python stuff. Nothing too, uh, specific, I guess. Just the usual tools you'd use for that kind of task.",
+            "timestamp": 1790927665.057354,
+            "question_index": 0
+          },
+          {
+            "speaker": "interviewer",
+            "text": "I see. What was the biggest challenge you faced in ensuring the accuracy of the structured data extraction, and how did you overcome it?",
+            "timestamp": 1790927666.9225612,
+            "question_index": 0
+          },
+          {
+            "speaker": "candidate",
+            "text": "Um, the biggest challenge... I guess it was just making sure it got the right information. You know, sometimes resumes are formatted really differently, so it was hard to, like, consistently pull out the exact same things.\n\nHow we overcame it? We, uh, we just kept, like, refining it. And, you know, running tests and stuff. Just trying to make it, uh, better at recognizing things.",
+            "timestamp": 1790927669.223018,
+            "question_index": 0
+          },
+          {
+            "speaker": "interviewer",
+            "text": "Understood. Now I'd like to ask you about Docker and Kubernetes. You've listed them on your resume. At a fundamental level, what problem does containerization solve, and why is Kubernetes particularly useful for deploying microservices like the ones you've built?",
+            "timestamp": 1790927672.1763413,
+            "question_index": 1
+          },
+          {
+            "speaker": "candidate",
+            "text": "Oh, Docker and Kubernetes. Yeah. Um, containerization, I guess it solves the problem of, like, things not working the same way on different computers. So, you put it in a container, and then it just, um, works. Everywhere.\n\nAnd Kubernetes is useful for microservices because it, uh, it helps manage them. Like, if you have a lot of them, it helps them all, um, run together smoothly. And if one goes down, it can, like, bring it back up.",
+            "timestamp": 1790927673.891486,
+            "question_index": 1
+          },
+          {
+            "speaker": "interviewer",
+            "text": "Thank you for that. Can you give an example from your experience where Docker or Kubernetes significantly simplified a deployment or operational challenge?",
+            "timestamp": 1790927675.6291075,
+            "question_index": 1
+          },
+          {
+            "speaker": "candidate",
+            "text": "Um, an example... Well, I guess when we were, uh, deploying the resume parsing service, it was really helpful. Before, it was kind of a hassle to get it running on different servers, but with Docker, it just, um, worked. We didn't have to worry about, like, dependencies and stuff. It just ran.",
+            "timestamp": 1790927677.0508633,
+            "question_index": 1
+          },
+          {
+            "speaker": "interviewer",
+            "text": "Got it. Your resume mentions 'Integration of Gemini-based LLM pipelines for document classification.' Can you elaborate on the architecture of these pipelines? Specifically, how did you handle data preparation, prompt engineering, and the integration of Gemini into your application workflow?",
+            "timestamp": 1790927679.6122837,
+            "question_index": 2
+          },
+          {
+            "speaker": "candidate",
+            "text": "Oh, the Gemini LLM pipelines. Yeah. Um, the architecture was, like, you know, we had the data coming in, and then it went through the pipeline.\n\nData preparation involved, uh, getting the documents ready for the LLM. Prompt engineering was about, um, telling the LLM what to do. And integrating Gemini into the workflow was just, like, connecting it up so it could, um, classify the documents. You know, making sure it all talked to each other.",
+            "timestamp": 1790927681.1236582,
+            "question_index": 2
+          },
+          {
+            "speaker": "interviewer",
+            "text": "What were some of the key prompt engineering techniques you experimented with to achieve the 94% accuracy, and what did you learn from that process?",
+            "timestamp": 1790927682.4780958,
+            "question_index": 2
+          },
+          {
+            "speaker": "candidate",
+            "text": "Um, we experimented with, like, different ways of, uh, phrasing the prompts. You know, trying to make them clearer for the LLM. Like, sometimes we'd add more context, or try to, um, simplify the instructions.\n\nWhat I learned was that, uh, prompts are really important. Like, how you ask the LLM to do something really affects how well it does it. So, you just have to keep trying different things until it, um, works.",
+            "timestamp": 1790927684.2656229,
+            "question_index": 2
+          },
+          {
+            "speaker": "interviewer",
+            "text": "Thank you for that. My next question is: What is the primary purpose of embeddings in the context of LLMs, and how might they be used in an application like retrieval-augmented generation (RAG)?",
+            "timestamp": 1790927687.0911536,
+            "question_index": 3
+          },
+          {
+            "speaker": "candidate",
+            "text": "Embeddings, um, their primary purpose is to, like, represent words or pieces of text as numbers. So the LLM can, uh, understand them better. It's like turning text into something a computer can work with.\n\nIn RAG, they could be used to, um, find relevant documents. So, like, if you have a question, you'd turn the question into an embedding, and then use that to find documents with similar embeddings. And then the LLM can, uh, use those documents to answer the question.",
+            "timestamp": 1790927688.7906528,
+            "question_index": 3
+          },
+          {
+            "speaker": "interviewer",
+            "text": "Can you walk me through a high-level example of how embeddings would facilitate the 'retrieval' part of RAG?",
+            "timestamp": 1790927690.5090578,
+            "question_index": 3
+          },
+          {
+            "speaker": "candidate",
+            "text": "Sure. So, um, for the retrieval part, you'd have all your documents, right? And you'd, uh, turn each of those documents into an embedding. So you have a whole bunch of these number representations for your documents.\n\nThen, when a user asks a question, you'd also turn that question into an embedding. And then you compare the question's embedding to all the document embeddings. You look for the ones that are, like, most similar. The ones that are closest in terms of those numbers.\n\nAnd those similar documents are the ones you'd, uh, retrieve. And then you pass those to the LLM so it can generate an answer using the information from those retrieved documents. It's all about finding the closest matches with those number representations.",
+            "timestamp": 1790927692.2753642,
+            "question_index": 3
+          },
+          {
+            "speaker": "interviewer",
+            "text": "I see. You've worked with PostgreSQL and Redis. Can you explain the fundamental difference in their use cases and why you might choose one over the other for specific data storage or caching needs?",
+            "timestamp": 1790927695.0670545,
+            "question_index": 4
+          },
+          {
+            "speaker": "candidate",
+            "text": "Okay, PostgreSQL and Redis. Um, they're both databases, but they're for, like, different things.\n\nPostgreSQL is a, uh, relational database. So it's good for structured data, like tables with rows and columns. You'd use it when you need to store, like, important, consistent data, and when you need to do complex queries. Like, if you have user profiles or orders, that kind of stuff.\n\nRedis is more of a, um, in-memory data store. So it's really fast. You'd use it for caching, or for things that need to be accessed really quickly, but maybe don't need to be stored permanently in the same way. Like, session data, or leaderboards, or things that expire. It's not really for, um, long-term, primary storage. You'd pick Redis when speed is super important, and PostgreSQL when data integrity and complex relationships are key.",
+            "timestamp": 1790927697.2877548,
+            "question_index": 4
+          },
+          {
+            "speaker": "interviewer",
+            "text": "In your 'FastAPI microservice for resume parsing,' where might you have considered using Redis, and where would PostgreSQL have been essential?",
+            "timestamp": 1790927698.5557232,
+            "question_index": 4
+          },
+          {
+            "speaker": "candidate",
+            "text": "Um, in the resume parsing service...\n\nPostgreSQL would have been essential for, like, storing the actual parsed data. So once we extracted all the structured info from a resume, we'd put that into PostgreSQL. And maybe also for storing, like, user accounts if it was a multi-user system, or keeping track of which resumes had been processed. You know, the important, structured stuff that we needed to query later.\n\nRedis, I guess, could have been used for, um, caching. Like, if certain common keywords or patterns were being looked up a lot during the parsing process, we could have cached those in Redis to speed things up. Or maybe for storing, like, temporary processing states for a resume that was actively being worked on, before its final data was committed to PostgreSQL. You know, just for quick, temporary stuff.",
+            "timestamp": 1790927700.754365,
+            "question_index": 4
+          },
+          {
+            "speaker": "interviewer",
+            "text": "That's a clear distinction, thank you. Moving on, what is CI/CD, and how did GitHub Actions facilitate your CI/CD processes in your previous role?",
+            "timestamp": 1790927703.5091178,
+            "question_index": 5
+          },
+          {
+            "speaker": "candidate",
+            "text": "CI/CD, um, it stands for Continuous Integration and Continuous Delivery. It's basically about automating the process of, like, getting your code from development to production. So, you know, building it, testing it, and then deploying it.\n\nGitHub Actions, uh, helped with that by, like, running tests automatically whenever we pushed new code. So, you know, it would build the project, run all the tests, and if everything passed, it could even, um, help deploy it. It just made the whole process faster and, uh, less manual. So we knew quickly if we broke something.",
+            "timestamp": 1790927705.7386198,
+            "question_index": 5
+          },
+          {
+            "speaker": "interviewer",
+            "text": "Can you describe a specific workflow you implemented with GitHub Actions for one of your projects?",
+            "timestamp": 1790927707.0542543,
+            "question_index": 5
+          },
+          {
+            "speaker": "candidate",
+            "text": "Um, a specific workflow... Okay, so for the resume parsing service, we had a workflow set up.\n\nWhen we pushed code to the `main` branch, or even a pull request, um, GitHub Actions would kick off. It would, like, first install all the Python dependencies. Then it would run the unit tests we had written for the parsing logic. If those passed, it would then, um, build the Docker image for the service. And if that all succeeded, it could potentially, like, push that image to a container registry.\n\nThat was, uh, the main one. It just made sure everything was working before it went out.",
+            "timestamp": 1790927708.9087389,
+            "question_index": 5
+          },
+          {
+            "speaker": "interviewer",
+            "text": "That's a clear example. Thank you. Now, imagine you've deployed a new LLM-based classification model to production, and after a few weeks, you start noticing a significant drop in its accuracy for certain document types. Walk me through your process for diagnosing and resolving this issue, considering monitoring, data drift, and model retraining.",
+            "timestamp": 1790927712.0356727,
+            "question_index": 6
+          },
+          {
+            "speaker": "candidate",
+            "text": "Okay, um, if the LLM model started dropping in accuracy, that would be, uh, not good.\n\nFirst, I'd probably look at the monitoring dashboards, if we had them. Just to see if any, like, metrics were looking weird. Like, maybe the number of errors or something. Or if there were, um, specific document types that were causing problems, like you said.\n\nThen, for data drift, I guess I'd need to compare the new data coming in, the data that the model is seeing now, with the data it was trained on. You know, to see if there's a difference. Like, maybe the types of resumes or documents have changed over time, and the model isn't used to those new types. I'd just, uh, look at the input data and try to see what's different.\n\nAnd resolving it, if it was data drift or just the model getting old, would probably involve retraining. We'd collect more of the new data that's causing problems, label it, and then, um, use that new data, maybe combined with the old data, to retrain the model. Hopefully, that would make it, uh, better at handling the new document types and bring the accuracy back up. It's a lot of, like, trying to figure out what changed.",
+            "timestamp": 1790927716.0126386,
+            "question_index": 6
+          },
+          {
+            "speaker": "interviewer",
+            "text": "What specific metrics would you be tracking in production to detect such a drop in accuracy early?",
+            "timestamp": 1790927717.3438718,
+            "question_index": 6
+          },
+          {
+            "speaker": "candidate",
+            "text": "Um, specific metrics... Well, obviously, we'd be tracking the, uh, accuracy itself. Like, if we had a way to get ground truth labels for a sample of the production data, we'd compare the model's classifications to those.\n\nBesides accuracy, we'd also track things like, uh, the confidence scores of the model's predictions. If the confidence scores started dropping for a lot of documents, that could be a sign something's wrong.\n\nAnd then, just general input data metrics, like, um, the distribution of document lengths or the frequency of certain keywords. If those distributions changed a lot from what the model was trained on, that could signal data drift, even before accuracy drops are fully visible. So, yeah, accuracy, confidence, and input data characteristics.",
+            "timestamp": 1790927719.444127,
+            "question_index": 6
+          },
+          {
+            "speaker": "interviewer",
+            "text": "That's a good set of metrics to track. Let's shift to your experience with architectural refactoring. You successfully migrated a monolithic Flask app to a containerized microservice architecture on Kubernetes, reducing deployment time significantly. Can you describe the architectural decisions you made during this migration? What were the biggest challenges, and how did you ensure data consistency and inter-service communication in the new distributed environment?",
+            "timestamp": 1790927722.3519976,
+            "question_index": 7
+          },
+          {
+            "speaker": "candidate",
+            "text": "Oh, the Flask app migration. Yeah, that was, um, a big one.\n\nThe architectural decisions were, like, taking the big Flask app and breaking it up into smaller pieces. So, instead of one big app doing everything, we had, like, separate services for different functions. One for users, one for, um, processing jobs, maybe one for notifications. Each one was its own microservice. And then, putting them all in Docker containers, and using Kubernetes to run them.\n\nBiggest challenges... I guess just figuring out how to break it up without, like, breaking everything. And making sure all the new little services could still talk to each other. And then, uh, getting Kubernetes set up correctly was also a challenge.\n\nFor data consistency, that was, um, tricky. We mostly tried to make sure each service had its own data store, if possible, for its specific function. But if they needed to share, we'd, like, use a central database that they could all access in a controlled way.\n\nInter-service communication, we used, uh, standard HTTP APIs for that. So, one service would just make an API call to another service when it needed something. We tried to keep it simple.",
+            "timestamp": 1790927724.8655174,
+            "question_index": 7
+          },
+          {
+            "speaker": "interviewer",
+            "text": "How did you handle data consistency across different microservices, especially if they needed to share or access related data?",
+            "timestamp": 1790927726.4295707,
+            "question_index": 7
+          },
+          {
+            "speaker": "candidate",
+            "text": "Right, data consistency. Um, well, ideally, each microservice would own its own data. So, if the user service needed user data, it would have its own user database.\n\nBut if they *really* needed to share, or if one service needed data from another, we tried to, um, not have them directly access each other's databases. Instead, the service that owned the data would expose an API endpoint. So, if Service A needed data from Service B, it would call Service B's API, and Service B would retrieve the data from its own database and send it back. That way, Service B was still in control of its data.\n\nFor really complex stuff, like if an action in one service needed to trigger an update in another, we might have looked at message queues, but mostly it was, um, direct API calls or trying to minimize shared data as much as possible. It was about, like, keeping each service responsible for its own stuff.",
+            "timestamp": 1790927728.8106918,
+            "question_index": 7
+          },
+          {
+            "speaker": "interviewer",
+            "text": "That makes sense. Keeping services responsible for their own data is a good principle. Now, let's talk about architectural styles more broadly. What is the primary difference between a monolithic application and a microservice architecture, and what are some key benefits of moving from one to the other?",
+            "timestamp": 1790927731.6392245,
+            "question_index": 8
+          },
+          {
+            "speaker": "candidate",
+            "text": "Okay, monolithic versus microservices.\n\nA monolithic application is basically, like, one big program. All the code for the whole application is in one place, running as a single unit. If you want to update one small part, you usually have to deploy the whole thing again.\n\nMicroservices, on the other hand, are a bunch of smaller, independent services. Each one does a specific job, and they all communicate with each other. You can update or deploy one service without affecting the others.\n\nKey benefits of moving from monolithic to microservices are, um, better scalability. You can scale individual services that are under heavy load, instead of having to scale the whole big app. Also, easier maintenance, because the codebases are smaller. And, uh, faster deployments, since you're only deploying a small part. And teams can work on different services more independently. It's just, like, more flexible, I guess.",
+            "timestamp": 1790927733.8153925,
+            "question_index": 8
+          },
+          {
+            "speaker": "interviewer",
+            "text": "What are some of the complexities or challenges introduced when moving to a microservice architecture?",
+            "timestamp": 1790927735.3963225,
+            "question_index": 8
+          },
+          {
+            "speaker": "candidate",
+            "text": "Challenges... oh, there are definitely challenges.\n\nOne big one is, like, managing all the different services. You have more things to monitor, more things to deploy. It's just more complex overall.\n\nThen there's, um, inter-service communication. Making sure they all talk to each other correctly, and dealing with network issues or latency between services.\n\nData consistency, like we talked about, becomes harder too. When data is spread across different databases for different services, ensuring everything stays consistent can be a real headache.\n\nAnd then, debugging can be harder. If something goes wrong, it's not always clear which service caused the problem, because it's a whole chain of calls. So, yeah, increased operational complexity, communication overhead, distributed data challenges, and harder debugging. It's not, um, always a simple switch.",
+            "timestamp": 1790927737.602253,
+            "question_index": 8
+          },
+          {
+            "speaker": "interviewer",
+            "text": "You've highlighted some important trade-offs there. Let's move on to a coding exercise. Given your experience with Python and FastAPI, I'd like you to write a Python function that takes a list of strings (representing document chunks) and a query string, and returns the index of the chunk that is most semantically similar to the query. You can assume a hypothetical `get_embedding(text: str) -> list[float]` function exists that returns a numerical embedding for any given text, and that you should use cosine similarity for comparison. If the list is empty, return -1.\n\nHere's some starter code:\n\n```python\nimport math\n\ndef get_embedding(text: str) -> list[float]:\n    # This is a hypothetical function for the exercise.\n    # In a real scenario, this would call an LLM embedding API.\n    # For simplicity, we'll return a dummy embedding based on text length and character sum.\n    if not text: return [0.0]\n    val = sum(ord(c) for c in text) / len(text)\n    return [val, len(text)]\n\ndef find_most_similar_chunk(document_chunks: list[str], query: str) -> int:\n    pass\n```",
+            "timestamp": 1790927741.1163783,
+            "question_index": 9
+          },
+          {
+            "speaker": "candidate",
+            "text": "Okay, um, a coding exercise. Right. This is about finding the most similar chunk using embeddings.\n\nSo, first, if the list of document chunks is empty, I guess it should just return -1, like you said. That's, uh, pretty straightforward.\n\nThen, I need to get the embedding for the `query` string, using that `get_embedding` function you provided. And then, I'll go through each `chunk` in the `document_chunks` list. For each chunk, I'll get its embedding, and then I'll need to calculate the cosine similarity between the query's embedding and the chunk's embedding.\n\nCosine similarity, I remember that. It involves, like, the dot product of the vectors and then dividing by the product of their magnitudes. I'll probably need `math.sqrt` for the magnitudes.\n\nI'll keep track of the highest similarity I find and the index of the chunk that gave me that similarity.\n\nLet me, uh, try to put that into code. I'll write a small helper function for cosine similarity, that might make it clearer.\n\n```python\nimport math\n\ndef get_embedding(text: str) -> list[float]:\n    # This is a hypothetical function for the exercise.\n    # In a real scenario, this would call an LLM embedding API.\n    # For simplicity, we'll return a dummy embedding based on text length and character sum.\n    if not text: return [0.0]\n    val = sum(ord(c) for c in text) / len(text)\n    return [val, len(text)]\n\n# Helper function to calculate cosine similarity\ndef _calculate_cosine_similarity(vec1: list[float], vec2: list[float]) -> float:\n    # Calculate dot product\n    dot_product = sum(a * b for a, b in zip(vec1, vec2))\n\n    # Calculate magnitude (length) of each vector\n    magnitude_vec1 = math.sqrt(sum(a * a for a in vec1))\n    magnitude_vec2 = math.sqrt(sum(b * b for b in vec2))\n\n    # Handle cases where one or both magnitudes are zero\n    if magnitude_vec1 == 0 or magnitude_vec2 == 0:\n        if magnitude_vec1 == 0 and magnitude_vec2 == 0:\n            return 1.0  # Both are zero vectors, considered perfectly similar\n        return 0.0  # One is zero, other is not, so no similarity\n    \n    # Return the cosine similarity\n    return dot_product / (magnitude_vec1 * magnitude_vec2)\n\ndef find_most_similar_chunk(document_chunks: list[str], query: str) -> int:\n    # Handle the empty document_chunks list case\n    if not document_chunks:\n        return -1\n\n    # Get the embedding for the query string\n    query_embedding = get_embedding(query)\n    \n    # Initialize variables to track the best match\n    max_similarity = -1.0  # Cosine similarity ranges from -1 to 1, so -1.0 is a good starting point\n    most_similar_index = -1\n\n    # Iterate through each chunk to find the most similar one\n    for i, chunk in enumerate(document_chunks):\n        chunk_embedding = get_embedding(chunk)\n        \n        # Calculate the similarity between the query and the current chunk\n        current_similarity = _calculate_cosine_similarity(query_embedding, chunk_embedding)\n\n        # If this chunk is more similar than the previous best, update our tracking variables\n        if current_similarity > max_similarity:\n            max_similarity = current_similarity\n            most_similar_index = i\n            \n    return most_similar_index\n\n```\n\nSo, yeah, that's how I'd approach it. The `_calculate_cosine_similarity` function does the math part, and then the main function just loops through, gets embeddings, and compares them, keeping track of the best one.",
+            "timestamp": 1790927758.4351857,
+            "question_index": 9
+          },
+          {
+            "speaker": "interviewer",
+            "text": "That looks like a correct and well-structured solution, including the edge case handling and a clear helper function. Well done.\n\nLet's move on. TechNova Solutions works with various cloud platforms. While your resume doesn't explicitly detail extensive cloud platform experience beyond Kubernetes, how would you approach designing a highly available and fault-tolerant ML inference service on a cloud platform like AWS, assuming you need to serve millions of requests per day with low latency?",
+            "timestamp": 1790927761.510375,
+            "question_index": 10
+          },
+          {
+            "speaker": "candidate",
+            "text": "Okay, designing a highly available and fault-tolerant ML inference service on a cloud platform like AWS... even without, um, deep AWS experience, I guess the general principles would apply.\n\nFor high availability and fault tolerance, you'd need to make sure there are, like, multiple copies of your service running. So, if one server or one instance goes down, another one can just, um, take over automatically. You wouldn't want a single point of failure. So, redundancy is key.\n\nTo handle millions of requests per day with low latency, you'd definitely need to scale it out. That means having, um, multiple servers running your ML model, and then using something like a load balancer to distribute the incoming requests across all those servers. So, no single server gets overwhelmed. And the cloud is good for that because you can, like, spin up more servers easily when you need them.\n\nYou'd also need to, um, monitor everything very closely. Like, watching the performance of the models, the latency, the error rates. So you can see if something is starting to go wrong and fix it quickly.\n\nSo, in short: multiple instances for redundancy, load balancing for distribution and scale, and constant monitoring to keep an eye on things. That's how I'd, uh, approach it generally.",
+            "timestamp": 1790927767.4495065,
+            "question_index": 10
+          },
+          {
+            "speaker": "interviewer",
+            "text": "Can you name some specific AWS services you would leverage for each component of this architecture (e.g., compute, load balancing, database)?",
+            "timestamp": 1790927768.9027162,
+            "question_index": 10
+          },
+          {
+            "speaker": "candidate",
+            "text": "Um, okay, specific AWS services.\n\nFor compute, where the ML model actually runs, I guess you'd use something like, uh, EC2 instances. Or maybe if you're using containers, you could use ECS or EKS, which is like Kubernetes on AWS. So, EC2 for the virtual machines.\n\nFor load balancing, AWS has its own, um, Elastic Load Balancer (ELB). That would distribute traffic across the EC2 instances.\n\nFor a database, if you needed one for storing, like, model configurations or inference logs, you could use RDS for a relational database, or maybe DynamoDB if it was, uh, more unstructured and needed really fast key-value access.\n\nAnd then for monitoring, there's, um, CloudWatch. That's for collecting logs and metrics from all the services.\n\nSo, yeah, EC2 or EKS for compute, ELB for load balancing, RDS or DynamoDB for data, and CloudWatch for monitoring. Those are the ones that, uh, come to mind.",
+            "timestamp": 1790927771.3859673,
+            "question_index": 10
+          },
+          {
+            "speaker": "interviewer",
+            "text": "Those are good choices for AWS services. Let's move to a behavioral question. Tell me about a time you faced a significant technical challenge or roadblock in one of your projects, perhaps during the 'migration of monolithic Flask app to containerized microservice architecture.' What was the challenge, what steps did you take to overcome it, and what did you learn from that experience?",
+            "timestamp": 1790927774.442989,
+            "question_index": 11
+          },
+          {
+            "speaker": "candidate",
+            "text": "Okay, a significant technical challenge...\n\nDuring the Flask app migration, one of the biggest challenges was, um, dealing with the database. The original monolithic app had just one big database that everything used. When we started breaking it into microservices, the idea was that each service should, like, ideally have its own data. But a lot of the data was interconnected.\n\nFor example, the user service needed user data, but then the order service also needed to know about users to process orders. And the inventory service needed to know about products, which users also interacted with. It was all, um, very tightly coupled in that one database.\n\nThe steps I took were, um, a lot of discussion with the team. We tried to figure out which parts of the database *really* belonged to which service. For cases where data absolutely had to be shared or referenced, we decided to, uh, make the service that owned the data expose an API for other services to query it, rather than letting them directly access its database table. So, the order service would ask the user service for user details, instead of looking them up directly in the user table.\n\nWhat I learned was that, um, breaking up a database is really hard. It's much harder than breaking up the code. And that thinking about data ownership and clear APIs for data access is super important when you go to microservices. You can't just, like, split the code and expect the data to magically sort itself out. It requires a lot of careful planning and, uh, thinking about how services will interact.",
+            "timestamp": 1790927777.3497276,
+            "question_index": 11
+          },
+          {
+            "speaker": "interviewer",
+            "text": "Can you be more specific about the actions you took to identify which parts of the database *really* belonged to which service? What was the exact outcome or impact of your efforts in this specific area?",
+            "timestamp": 1790927778.8761597,
+            "question_index": 11
+          },
+          {
+            "speaker": "candidate",
+            "text": "Um, okay, being more specific. To identify which parts of the database belonged to which service, we, uh, basically drew diagrams. A lot of diagrams. We mapped out all the tables in the existing database and then tried to, um, draw lines between them showing which parts of the old Flask app were using which tables.\n\nThen, we tried to group those tables and their corresponding application logic into potential new services. Like, \"Okay, these three tables seem to be mostly about users, so that could be the user service's data.\" And \"these five tables are about orders and products, so maybe that's an order service and an inventory service.\" It was a lot of, um, visual mapping and discussion.\n\nThe exact outcome or impact was that we ended up with a clearer separation of concerns. Instead of one giant database schema that every new service could just randomly query, we had, like, a few core databases for the most critical data that were owned by specific services. And for data that was referenced across services, we enforced the API-first approach.\n\nThe impact was, um, it made the new services more independent. They didn't accidentally step on each other's data as much. It also meant we could, like, potentially use different database technologies for different services if it made sense, though we mostly stuck with PostgreSQL for consistency. It reduced the coupling, I guess, which was the whole point of microservices.",
+            "timestamp": 1790927781.7518198,
+            "question_index": 11
+          },
+          {
+            "speaker": "interviewer",
+            "text": "That's a very clear explanation of a complex process, thank you. Let's talk more about LLMs. The job description mentions designing, training, and fine-tuning ML/LLM models for tasks like RAG and structured extraction. Given your experience with Gemini, how would you approach fine-tuning a pre-trained LLM for a very specific, niche document classification task where labeled data is scarce? What are the trade-offs and potential pitfalls?",
+            "timestamp": 1790927784.9011967,
+            "question_index": 12
+          },
+          {
+            "speaker": "candidate",
+            "text": "Okay, fine-tuning an LLM for a niche task with scarce labeled data. That's, um, a common problem.\n\nMy approach would be to, first, really focus on getting the most out of the *few* labeled examples we have. This might involve, like, very careful data cleaning and augmentation. Like, if we have a document, maybe we can create slightly varied versions of it to, um, expand our training set a bit.\n\nThen, for the fine-tuning itself, with scarce data, you probably wouldn't want to do, like, a full fine-tune of all the LLM's parameters. That could easily lead to overfitting. Instead, I'd look into methods like, um, Parameter-Efficient Fine-Tuning (PEFT), like LoRA. These methods only train a small portion of the model's parameters, making it less likely to overfit on the limited data, but still adapting it to the specific task.\n\nThe trade-offs are that, um, you might not get the absolute peak performance that a full fine-tune with abundant data would achieve. The model might still retain some of its general knowledge and not be perfectly specialized.\n\nPotential pitfalls include, uh, overfitting, as I mentioned. If you train too aggressively on too little data, the model just memorizes those examples and performs badly on anything new. Another pitfall is, like, accidentally making the model forget its general capabilities, which is called catastrophic forgetting. So, you have to be careful with the learning rate and the number of training epochs. It's a delicate balance.",
+            "timestamp": 1790927787.842469,
+            "question_index": 12
+          },
+          {
+            "speaker": "interviewer",
+            "text": "When labeled data is scarce, what are some more parameter-efficient fine-tuning (PEFT) techniques you might consider, and why?",
+            "timestamp": 1790927790.580184,
+            "question_index": 12
+          },
+          {
+            "speaker": "candidate",
+            "text": "Okay, more PEFT techniques, um, besides LoRA, which I mentioned.\n\nThere's also, like, prompt tuning or prefix tuning. With these, you don't actually change the LLM's weights at all. Instead, you train a small set of \"soft prompts\" or \"prefixes\" that are prepended to the input. It's like, um, learning the best way to prompt the model for your specific task, but without touching the big, pre-trained model itself.\n\nThe reason you'd consider these is because they are *extremely* parameter-efficient. You're only training a tiny fraction of the parameters compared to even LoRA, which still adds some trainable layers. This makes them even less prone to overfitting when you have very, very little labeled data. They're also faster to train and require less memory.\n\nAnother one, though maybe a bit less common for *fine-tuning* per se and more for adapting, is, um, adapter layers. These are small neural network modules inserted between the layers of the pre-trained LLM. Only the adapter layers are trained, keeping the main LLM weights frozen. They can be very effective for specific tasks without modifying the core model.\n\nSo, yeah, prompt tuning, prefix tuning, and adapter layers are good options when data is really scarce, because they minimize the number of parameters you need to train, making it less likely to overfit and, uh, faster.",
+            "timestamp": 1790927793.8357108,
+            "question_index": 12
+          },
+          {
+            "speaker": "interviewer",
+            "text": "Those are excellent examples of PEFT techniques and why they're useful. Now, I notice you have a year-long gap between your internship and your first full-time role. Can you tell me a bit about what you were doing during that time and what you learned or achieved?",
+            "timestamp": 1790927796.8056865,
+            "question_index": 13
+          },
+          {
+            "speaker": "candidate",
+            "text": "Oh, um, that gap. Yeah. After my internship, I, uh, I took some time. I was just, like, exploring some personal things and trying to figure out what I wanted to do next, I guess.\n\nI did some, um, self-study during that time. Just, you know, trying to keep up with some of the technologies I was interested in. Nothing too, uh, structured, but I was definitely, like, trying to learn things.\n\nWhat I learned... I guess I learned a bit about, um, self-motivation. And how to, uh, structure my own time. Yeah.",
+            "timestamp": 1790927799.582489,
+            "question_index": 13
+          },
+          {
+            "speaker": "interviewer",
+            "text": "Were there any specific technical skills or projects you focused on during that time that you feel are relevant to this role?",
+            "timestamp": 1790927801.952431,
+            "question_index": 13
+          },
+          {
+            "speaker": "candidate",
+            "text": "Um, specific technical skills or projects... Not really, like, a formal project with a clear deliverable or anything.\n\nI was mostly just, um, reading articles and trying out some small code snippets related to, like, machine learning concepts. You know, just playing around with some Python libraries. And keeping an eye on, um, what was new in the AI space.\n\nSo, nothing I could, uh, point to as a, like, a finished product or anything. Just general exploration and trying to stay, um, current.",
+            "timestamp": 1790927804.1267,
+            "question_index": 13
+          },
+          {
+            "speaker": "interviewer",
+            "text": "I understand. It's good that you were actively engaged in self-learning. Let's move on to our next question. The AI Engineer role at TechNova Solutions involves both designing and deploying ML/LLM models, as well as building and maintaining production pipelines. How do you balance the iterative, experimental nature of ML model development with the need for robust, reliable, and scalable production systems?",
+            "timestamp": 1790927807.3100243,
+            "question_index": 14
+          },
+          {
+            "speaker": "candidate",
+            "text": "That's, um, a good question. Balancing the experimental stuff with the production stuff.\n\nI guess it's about, like, having clear stages. So, when you're experimenting with ML models, you're in a more, um, flexible environment. You're trying different ideas, different models, different parameters. It's okay for things to be a bit messy there.\n\nBut once you have something that looks promising and you're thinking about putting it into production, that's when you have to switch gears. You start to, uh, harden it. You build the robust pipelines around it. You add the monitoring, the testing, the deployment automation.\n\nSo, you keep the experimentation separate, maybe in, like, development environments or notebooks, and then when a model is ready, you treat it like any other software component that needs to be production-ready. You don't, um, just throw an experimental model straight into production. You put it through the whole CI/CD process, like we talked about earlier. It's about, like, having a clear hand-off from the research phase to the engineering phase.",
+            "timestamp": 1790927810.1170156,
+            "question_index": 14
+          },
+          {
+            "speaker": "interviewer",
+            "text": "How do you ensure that an experimental model, once proven effective, can be seamlessly and reliably transitioned into a production environment?",
+            "timestamp": 1790927811.5675838,
+            "question_index": 14
+          },
+          {
+            "speaker": "candidate",
+            "text": "To ensure a smooth transition, um, it's about making sure the experimental environment isn't *too* different from the production one. Like, if you're using certain libraries or versions in development, you should try to use the same ones in production. That helps avoid, um, \"it works on my machine\" problems.\n\nThen, you'd need to, uh, wrap the model in an API. So, instead of just running a script, you have a defined way for other services to interact with it, like a FastAPI endpoint. This makes it easier to integrate into existing systems.\n\nAlso, thorough testing. Not just, like, accuracy tests, but also performance tests, load tests. Making sure it can handle the expected traffic. And, uh, having proper version control for the model itself and its dependencies. So you know exactly what you're deploying.\n\nIt's basically about, um, standardizing the packaging and deployment process, often using containers like Docker, and making sure all the non-functional requirements like performance and reliability are met *before* it hits production.",
+            "timestamp": 1790927814.060249,
+            "question_index": 14
+          },
+          {
+            "speaker": "interviewer",
+            "text": "That's a comprehensive approach to transitioning models to production, thank you. That covers all my questions for you, Priya. Do you have any questions for me about TechNova Solutions, the team, or the role?",
+            "timestamp": 1790927817.2055748,
+            "question_index": 15
+          },
+          {
+            "speaker": "system",
+            "text": "Eval safety cap hit: interview did not end within 30 turns.",
+            "timestamp": 1790927817.20558,
+            "question_index": 15
+          }
+        ],
+        "transcript_length": 62,
+        "questions_reached": 15,
+        "total_questions": 16,
+        "report": {
+          "overall_score": 5.5,
+          "hiring_recommendation": "maybe",
+          "summary": "Priya demonstrates a foundational understanding of core concepts like containerization, CI/CD, and basic LLM principles. However, her answers often lack depth, specific technical details, and proactive problem-solving approaches, relying heavily on vague descriptions. While she can articulate high-level concepts, the absence of concrete examples and detailed architectural decisions is a concern for an AI Engineer role.",
+          "strengths": [
+            "Understands fundamental concepts of Docker, Kubernetes, CI/CD, and embeddings.",
+            "Successfully completed the coding exercise with a correct and well-structured solution.",
+            "Articulates the high-level differences between PostgreSQL and Redis and their use cases.",
+            "Demonstrates awareness of PEFT techniques for LLM fine-tuning with scarce data."
+          ],
+          "improvements": [
+            "Provide more specific technical details and examples when describing projects and challenges.",
+            "Elaborate on architectural decisions, trade-offs, and specific technologies used beyond high-level descriptions.",
+            "Improve clarity and conciseness in explanations, avoiding filler words and vague phrasing.",
+            "Demonstrate a more proactive and in-depth problem-solving approach, especially for situational questions.",
+            "Address career gaps with more concrete examples of self-study or projects."
+          ],
+          "category_scores": {
+            "behavioral": 6,
+            "technical": 6,
+            "situational": 5,
+            "resume_deep_dive": 4,
+            "communication": 5
+          },
+          "question_feedback": [
+            {
+              "question_id": "q1",
+              "question": "Priya, your resume highlights a 'FastAPI microservice for resume parsing and structured data extraction.' Can you tell me more about the core problem this service aimed to solve and your specific contributions to its design and implementation?",
+              "candidate_answer": "Um, yeah, the FastAPI microservice. I guess the core problem it aimed to solve was, like, making it easier to, you know, get information out of resumes. Like, instead of someone having to read through all of them, the service would, uh, just sort of pull out the important bits.\n\nMy specific contributions? Well, I, um, I worked on some of the backend stuff. And, you know, getting it to, like, process the resumes.",
+              "score": 4,
+              "feedback": "The candidate provided a very high-level and vague description of the problem and her contributions. She struggled to articulate specific technical details or her direct involvement beyond 'backend stuff' and 'getting it to process resumes.' The follow-up questions also yielded generic answers.",
+              "missed_points": [
+                "Clear definition of the business problem (e.g., manual data entry, inconsistent data).",
+                "Architecture of the FastAPI service (endpoints, data flow).",
+                "Specific role in design, coding, and deployment.",
+                "Technologies used beyond FastAPI (parsing libraries, database interaction).",
+                "Quantified impact or scale."
+              ]
+            },
+            {
+              "question_id": "q2",
+              "question": "You've listed Docker and Kubernetes on your resume. At a fundamental level, what problem does containerization solve, and why is Kubernetes particularly useful for deploying microservices like the ones you've built?",
+              "candidate_answer": "Oh, Docker and Kubernetes. Yeah. Um, containerization, I guess it solves the problem of, like, things not working the same way on different computers. So, you put it in a container, and then it just, um, works. Everywhere.\n\nAnd Kubernetes is useful for microservices because it, uh, it helps manage them. Like, if you have a lot of them, it helps them all, um, run together smoothly. And if one goes down, it can, like, bring it back up.",
+              "score": 6,
+              "feedback": "Priya provided a decent high-level explanation of containerization's benefit (environment consistency) and Kubernetes' role in managing microservices (smooth operation, self-healing). However, the language is still quite informal ('like, things not working the same way'). The example given was also quite generic.",
+              "missed_points": [
+                "More formal explanation of portability and isolation benefits.",
+                "Specific Kubernetes features like scaling, load balancing, simplified deployment."
+              ]
+            },
+            {
+              "question_id": "q3",
+              "question": "Your resume mentions 'Integration of Gemini-based LLM pipelines for document classification.' Can you elaborate on the architecture of these pipelines? Specifically, how did you handle data preparation, prompt engineering, and the integration of Gemini into your application workflow?",
+              "candidate_answer": "Oh, the Gemini LLM pipelines. Yeah. Um, the architecture was, like, you know, we had the data coming in, and then it went through the pipeline.\n\nData preparation involved, uh, getting the documents ready for the LLM. Prompt engineering was about, um, telling the LLM what to do. And integrating Gemini into the workflow was just, like, connecting it up so it could, um, classify the documents. You know, making sure it all talked to each other.",
+              "score": 5,
+              "feedback": "The initial answer was very vague, essentially restating the question. The follow-up on prompt engineering was slightly better, mentioning 'different ways of phrasing' and 'adding more context' but still lacked concrete examples of techniques (e.g., few-shot, chain-of-thought).",
+              "missed_points": [
+                "Specific data preparation steps (cleaning, chunking, formatting).",
+                "Detailed prompt engineering strategies (few-shot, zero-shot, specific instructions).",
+                "Details on Gemini API integration (sync/async, error handling).",
+                "Post-processing of Gemini's output.",
+                "Challenges like token limits or latency."
+              ]
+            },
+            {
+              "question_id": "q4",
+              "question": "What is the primary purpose of embeddings in the context of LLMs, and how might they be used in an application like retrieval-augmented generation (RAG)?",
+              "candidate_answer": "Embeddings, um, their primary purpose is to, like, represent words or pieces of text as numbers. So the LLM can, uh, understand them better. It's like turning text into something a computer can work with.\n\nIn RAG, they could be used to, um, find relevant documents. So, like, if you have a question, you'd turn the question into an embedding, and then use that to find documents with similar embeddings. And then the LLM can, uh, use those documents to answer the question.",
+              "score": 7,
+              "feedback": "Priya provided a good fundamental definition of embeddings and a clear high-level explanation of their role in RAG. The follow-up question allowed her to walk through the retrieval process effectively, demonstrating a solid understanding of the concept.",
+              "missed_points": [
+                "Mention of vector databases for efficient storage and retrieval."
+              ]
+            },
+            {
+              "question_id": "q5",
+              "question": "You've worked with PostgreSQL and Redis. Can you explain the fundamental difference in their use cases and why you might choose one over the other for specific data storage or caching needs?",
+              "candidate_answer": "Okay, PostgreSQL and Redis. Um, they're both databases, but they're for, like, different things.\n\nPostgreSQL is a, uh, relational database. So it's good for structured data, like tables with rows and columns. You'd use it when you need to store, like, important, consistent data, and when you need to do complex queries. Like, if you have user profiles or orders, that kind of stuff.\n\nRedis is more of a, um, in-memory data store. So it's really fast. You'd use it for caching, or for things that need to be accessed really quickly, but maybe don't need to be stored permanently in the same way. Like, session data, or leaderboards, or things that expire. It's not really for, um, long-term, primary storage. You'd pick Redis when speed is super important, and PostgreSQL when data integrity and complex relationships are key.",
+              "score": 8,
+              "feedback": "Priya gave a clear and accurate explanation of the fundamental differences and use cases for PostgreSQL and Redis. Her examples for each were appropriate, and she clearly articulated the trade-offs. The follow-up question also received a good, practical application of these concepts.",
+              "missed_points": [
+                "Explicitly mentioning ACID compliance for PostgreSQL or persistence options for Redis."
+              ]
+            },
+            {
+              "question_id": "q6",
+              "question": "What is CI/CD, and how did GitHub Actions facilitate your CI/CD processes in your previous role?",
+              "candidate_answer": "CI/CD, um, it stands for Continuous Integration and Continuous Delivery. It's basically about automating the process of, like, getting your code from development to production. So, you know, building it, testing it, and then deploying it.\n\nGitHub Actions, uh, helped with that by, like, running tests automatically whenever we pushed new code. So, you know, it would build the project, run all the tests, and if everything passed, it could even, um, help deploy it. It just made the whole process faster and, uh, less manual. So we knew quickly if we broke something.",
+              "score": 7,
+              "feedback": "Priya provided a solid definition of CI/CD and explained how GitHub Actions automates testing and deployment. Her specific workflow example for the resume parsing service was clear and demonstrated practical experience.",
+              "missed_points": [
+                "More specific benefits like reduced manual errors or consistent deployments in the initial answer."
+              ]
+            },
+            {
+              "question_id": "q7",
+              "question": "Imagine you've deployed a new LLM-based classification model to production, and after a few weeks, you start noticing a significant drop in its accuracy for certain document types. Walk me through your process for diagnosing and resolving this issue, considering monitoring, data drift, and model retraining.",
+              "candidate_answer": "Okay, um, if the LLM model started dropping in accuracy, that would be, uh, not good.\n\nFirst, I'd probably look at the monitoring dashboards, if we had them. Just to see if any, like, metrics were looking weird. Like, maybe the number of errors or something. Or if there were, um, specific document types that were causing problems, like you said.\n\nThen, for data drift, I guess I'd need to compare the new data coming in, the data that the model is seeing now, with the data it was trained on. You know, to see if there's a difference. Like, maybe the types of resumes or documents have changed over time, and the model isn't used to those new types. I'd just, uh, look at the input data and try to see what's different.\n\nAnd resolving it, if it was data drift or just the model getting old, would probably involve retraining. We'd collect more of the new data that's causing problems, label it, and then, um, use that new data, maybe combined with the old data, to retrain the model. Hopefully, that would make it, uh, better at handling the new document types and bring the accuracy back up. It's a lot of, like, trying to figure out what changed.",
+              "score": 6,
+              "feedback": "Priya outlined a reasonable high-level process, starting with monitoring and moving to data drift and retraining. Her follow-up answer on specific metrics was good, including accuracy, confidence scores, and input data distributions. However, the initial response lacked depth in diagnosing the *why* before jumping to retraining.",
+              "missed_points": [
+                "Considering concept drift.",
+                "More detailed potential causes beyond 'model getting old'.",
+                "Mentioning re-evaluating prompts or A/B testing.",
+                "Rollback strategies."
+              ]
+            },
+            {
+              "question_id": "q8",
+              "question": "You successfully migrated a monolithic Flask app to a containerized microservice architecture on Kubernetes, reducing deployment time significantly. Can you describe the architectural decisions you made during this migration? What were the biggest challenges, and how did you ensure data consistency and inter-service communication in the new distributed environment?",
+              "candidate_answer": "Oh, the Flask app migration. Yeah, that was, um, a big one.\n\nThe architectural decisions were, like, taking the big Flask app and breaking it up into smaller pieces. So, instead of one big app doing everything, we had, like, separate services for different functions. One for users, one for, um, processing jobs, maybe one for notifications. Each one was its own microservice. And then, putting them all in Docker containers, and using Kubernetes to run them.\n\nBiggest challenges... I guess just figuring out how to break it up without, like, breaking everything. And making sure all the new little services could still talk to each other. And then, uh, getting Kubernetes set up correctly was also a challenge.\n\nFor data consistency, that was, um, tricky. We mostly tried to make sure each service had its own data store, if possible, for its specific function. But if they needed to share, we'd, like, use a central database that they could all access in a controlled way.\n\nInter-service communication, we used, uh, standard HTTP APIs for that. So, one service would just make an API call to another service when it needed something. We tried to keep it simple.",
+              "score": 6,
+              "feedback": "Priya described the general approach to breaking down the monolith and using Kubernetes. Her explanation of data consistency and inter-service communication improved with the follow-up, where she articulated the API-first approach for shared data. However, the initial answer was still quite high-level and lacked specific architectural patterns or challenges beyond 'breaking everything'.",
+              "missed_points": [
+                "Rationale for breaking down the monolith (scalability, independent deployments).",
+                "How services were identified and separated (e.g., by bounded context).",
+                "Specific Kubernetes features used (Deployments, Services, Ingress, ConfigMaps).",
+                "Challenges like distributed transactions, monitoring, and debugging in a microservices environment."
+              ]
+            },
+            {
+              "question_id": "q9",
+              "question": "What is the primary difference between a monolithic application and a microservice architecture, and what are some key benefits of moving from one to the other?",
+              "candidate_answer": "Okay, monolithic versus microservices.\n\nA monolithic application is basically, like, one big program. All the code for the whole application is in one place, running as a single unit. If you want to update one small part, you usually have to deploy the whole thing again.\n\nMicroservices, on the other hand, are a bunch of smaller, independent services. Each one does a specific job, and they all communicate with each other. You can update or deploy one service without affecting the others.\n\nKey benefits of moving from monolithic to microservices are, um, better scalability. You can scale individual services that are under heavy load, instead of having to scale the whole big app. Also, easier maintenance, because the codebases are smaller. And, uh, faster deployments, since you're only deploying a small part. And teams can work on different services more independently. It's just, like, more flexible, I guess.",
+              "score": 7,
+              "feedback": "Priya provided a clear and accurate definition of both architectural styles and listed several key benefits of microservices. Her follow-up answer on the challenges of microservices was also comprehensive, covering increased operational complexity, communication overhead, distributed data, and debugging.",
+              "missed_points": [
+                "Downsides of microservices in the initial answer."
+              ]
+            },
+            {
+              "question_id": "q10",
+              "question": "Given your experience with Python and FastAPI, let's do a quick coding exercise. I'd like you to write a Python function that takes a list of strings (representing document chunks) and a query string, and returns the index of the chunk that is most semantically similar to the query. You can assume a hypothetical `get_embedding(text: str) -> list[float]` function exists that returns a numerical embedding for any given text, and that you should use cosine similarity for comparison. If the list is empty, return -1.",
+              "candidate_answer": "Okay, um, a coding exercise. Right. This is about finding the most similar chunk using embeddings.\n\nSo, first, if the list of document chunks is empty, I guess it should just return -1, like you said. That's, uh, pretty straightforward.\n\nThen, I need to get the embedding for the `query` string, using that `get_embedding` function you provided. And then, I'll go through each `chunk` in the `document_chunks` list. For each chunk, I'll get its embedding, and then I'll need to calculate the cosine similarity between the query's embedding and the chunk's embedding.\n\nCosine similarity, I remember that. It involves, like, the dot product of the vectors and then dividing by the product of their magnitudes. I'll probably need `math.sqrt` for the magnitudes.\n\nI'll keep track of the highest similarity I find and the index of the chunk that gave me that similarity.\n\nLet me, uh, try to put that into code. I'll write a small helper function for cosine similarity, that might make it clearer.\n\n```python\nimport math\n\ndef get_embedding(text: str) -> list[float]:\n    # This is a hypothetical function for the exercise.\n    # In a real scenario, this would call an LLM embedding API.\n    # For simplicity, we'll return a dummy embedding based on text length and character sum.\n    if not text: return [0.0]\n    val = sum(ord(c) for c in text) / len(text)\n    return [val, len(text)]\n\n# Helper function to calculate cosine similarity\ndef _calculate_cosine_similarity(vec1: list[float], vec2: list[float]) -> float:\n    # Calculate dot product\n    dot_product = sum(a * b for a, b in zip(vec1, vec2))\n\n    # Calculate magnitude (length) of each vector\n    magnitude_vec1 = math.sqrt(sum(a * a for a in vec1))\n    magnitude_vec2 = math.sqrt(sum(b * b for b in vec2))\n\n    # Handle cases where one or both magnitudes are zero\n    if magnitude_vec1 == 0 or magnitude_vec2 == 0:\n        if magnitude_vec1 == 0 and magnitude_vec2 == 0:\n            return 1.0  # Both are zero vectors, considered perfectly similar\n        return 0.0  # One is zero, other is not, so no similarity\n    \n    # Return the cosine similarity\n    return dot_product / (magnitude_vec1 * magnitude_vec2)\n\ndef find_most_similar_chunk(document_chunks: list[str], query: str) -> int:\n    # Handle the empty document_chunks list case\n    if not document_chunks:\n        return -1\n\n    # Get the embedding for the query string\n    query_embedding = get_embedding(query)\n    \n    # Initialize variables to track the best match\n    max_similarity = -1.0  # Cosine similarity ranges from -1 to 1, so -1.0 is a good starting point\n    most_similar_index = -1\n\n    # Iterate through each chunk to find the most similar one\n    for i, chunk in enumerate(document_chunks):\n        chunk_embedding = get_embedding(chunk)\n        \n        # Calculate the similarity between the query and the current chunk\n        current_similarity = _calculate_cosine_similarity(query_embedding, chunk_embedding)\n\n        # If this chunk is more similar than the previous best, update our tracking variables\n        if current_similarity > max_similarity:\n            max_similarity = current_similarity\n            most_similar_index = i\n            \n    return most_similar_index\n\n```\n\nSo, yeah, that's how I'd approach it. The `_calculate_cosine_similarity` function does the math part, and then the main function just loops through, gets embeddings, and compares them, keeping track of the best one.",
+              "score": 9,
+              "feedback": "Priya successfully implemented the coding exercise. Her solution correctly calculates cosine similarity, handles the empty list edge case, and tracks the most similar chunk's index. The use of a helper function for cosine similarity also demonstrates good code organization.",
+              "missed_points": []
+            },
+            {
+              "question_id": "q11",
+              "question": "TechNova Solutions works with various cloud platforms. While your resume doesn't explicitly detail extensive cloud platform experience beyond Kubernetes, how would you approach designing a highly available and fault-tolerant ML inference service on a cloud platform like AWS, assuming you need to serve millions of requests per day with low latency?",
+              "candidate_answer": "Okay, designing a highly available and fault-tolerant ML inference service on a cloud platform like AWS... even without, um, deep AWS experience, I guess the general principles would apply.\n\nFor high availability and fault tolerance, you'd need to make sure there are, like, multiple copies of your service running. So, if one server or one instance goes down, another one can just, um, take over automatically. You wouldn't want a single point of failure. So, redundancy is key.\n\nTo handle millions of requests per day with low latency, you'd definitely need to scale it out. That means having, um, multiple servers running your ML model, and then using something like a load balancer to distribute the incoming requests across all those servers. So, no single server gets overwhelmed. And the cloud is good for that because you can, like, spin up more servers easily when you need them.\n\nYou'd also need to, um, monitor everything very closely. Like, watching the performance of the models, the latency, the error rates. So you can see if something is starting to go wrong and fix it quickly.\n\nSo, in short: multiple instances for redundancy, load balancing for distribution and scale, and constant monitoring to keep an eye on things. That's how I'd, uh, approach it generally.",
+              "score": 7,
+              "feedback": "Priya demonstrated a good understanding of the general principles for high availability and scalability in a cloud environment. Her follow-up answer was strong, naming specific AWS services (EC2/EKS, ELB, RDS/DynamoDB, CloudWatch) for each component, which addressed the potential skill gap effectively.",
+              "missed_points": [
+                "Mentioning auto-scaling groups explicitly.",
+                "Considering multiple Availability Zones/Regions for redundancy.",
+                "CDN for static assets or edge caching."
+              ]
+            },
+            {
+              "question_id": "q12",
+              "question": "Tell me about a time you faced a significant technical challenge or roadblock in one of your projects, perhaps during the 'migration of monolithic Flask app to containerized microservice architecture.' What was the challenge, what steps did you take to overcome it, and what did you learn from that experience?",
+              "candidate_answer": "Okay, a significant technical challenge...\n\nDuring the Flask app migration, one of the biggest challenges was, um, dealing with the database. The original monolithic app had just one big database that everything used. When we started breaking it into microservices, the idea was that each service should, like, ideally have its own data. But a lot of the data was interconnected.\n\nFor example, the user service needed user data, but then the order service also needed to know about users to process orders. And the inventory service needed to know about products, which users also interacted with. It was all, um, very tightly coupled in that one database.\n\nThe steps I took were, um, a lot of discussion with the team. We tried to figure out which parts of the database *really* belonged to which service. For cases where data absolutely had to be shared or referenced, we decided to, uh, make the service that owned the data expose an API for other services to query it, rather than letting them directly access its database table. So, the order service would ask the user service for user details, instead of looking them up directly in the user table.\n\nWhat I learned was that, um, breaking up a database is really hard. It's much harder than breaking up the code. And that thinking about data ownership and clear APIs for data access is super important when you go to microservices. You can't just, like, split the code and expect the data to magically sort itself out. It requires a lot of careful planning and, uh, thinking about how services will interact.",
+              "score": 7,
+              "feedback": "Priya clearly articulated a significant challenge related to data consistency during the migration. Her explanation of the actions taken (diagramming, team discussion, API-first approach) and the lessons learned (data ownership, API importance) followed the STAR method well. The follow-up question allowed her to elaborate on the specific actions and impact.",
+              "missed_points": [
+                "More specific examples of how the diagrams were used or the criteria for grouping tables."
+              ]
+            },
+            {
+              "question_id": "q13",
+              "question": "The job description mentions designing, training, and fine-tuning ML/LLM models for tasks like RAG and structured extraction. Given your experience with Gemini, how would you approach fine-tuning a pre-trained LLM for a very specific, niche document classification task where labeled data is scarce? What are the trade-offs and potential pitfalls?",
+              "candidate_answer": "Okay, fine-tuning an LLM for a niche task with scarce labeled data. That's, um, a common problem.\n\nMy approach would be to, first, really focus on getting the most out of the *few* labeled examples we have. This might involve, like, very careful data cleaning and augmentation. Like, if we have a document, maybe we can create slightly varied versions of it to, um, expand our training set a bit.\n\nThen, for the fine-tuning itself, with scarce data, you probably wouldn't want to do, like, a full fine-tune of all the LLM's parameters. That could easily lead to overfitting. Instead, I'd look into methods like, um, Parameter-Efficient Fine-Tuning (PEFT), like LoRA. These methods only train a small portion of the model's parameters, making it less likely to overfit on the limited data, but still adapting it to the specific task.\n\nThe trade-offs are that, um, you might not get the absolute peak performance that a full fine-tune with abundant data would achieve. The model might still retain some of its general knowledge and not be perfectly specialized.\n\nPotential pitfalls include, uh, overfitting, as I mentioned. If you train too aggressively on too little data, the model just memorizes those examples and performs badly on anything new. Another pitfall is, like, accidentally making the model forget its general capabilities, which is called catastrophic forgetting. So, you have to be careful with the learning rate and the number of training epochs. It's a delicate balance.",
+              "score": 8,
+              "feedback": "Priya demonstrated a strong understanding of fine-tuning LLMs with scarce data, correctly identifying PEFT techniques like LoRA and discussing trade-offs and pitfalls like overfitting and catastrophic forgetting. Her follow-up answer further elaborated on other PEFT techniques (prompt tuning, prefix tuning, adapter layers) and their benefits, showcasing good depth of knowledge.",
+              "missed_points": [
+                "Mentioning active learning or human-in-the-loop approaches for data labeling.",
+                "Discussing robust evaluation strategies with limited data."
+              ]
+            },
+            {
+              "question_id": "q14",
+              "question": "You have a year-long gap between your internship and your first full-time role. Can you tell me a bit about what you were doing during that time and what you learned or achieved?",
+              "candidate_answer": "Oh, um, that gap. Yeah. After my internship, I, uh, I took some time. I was just, like, exploring some personal things and trying to figure out what I wanted to do next, I guess.\n\nI did some, um, self-study during that time. Just, you know, trying to keep up with some of the technologies I was interested in. Nothing too, uh, structured, but I was definitely, like, trying to learn things.\n\nWhat I learned... I guess I learned a bit about, um, self-motivation. And how to, uh, structure my own time. Yeah.",
+              "score": 4,
+              "feedback": "Priya's explanation for the career gap was vague and lacked specific details about technical skills gained or projects worked on. While she mentioned self-study, she couldn't provide concrete examples even when prompted, which makes it hard to assess how that time contributed to her professional development.",
+              "missed_points": [
+                "Specific technical skills gained or projects worked on.",
+                "Clearer articulation of personal growth or achievements relevant to a technical role."
+              ]
+            },
+            {
+              "question_id": "q15",
+              "question": "The AI Engineer role at TechNova Solutions involves both designing and deploying ML/LLM models, as well as building and maintaining production pipelines. How do you balance the iterative, experimental nature of ML model development with the need for robust, reliable, and scalable production systems?",
+              "candidate_answer": "That's, um, a good question. Balancing the experimental stuff with the production stuff.\n\nI guess it's about, like, having clear stages. So, when you're experimenting with ML models, you're in a more, um, flexible environment. You're trying different ideas, different models, different parameters. It's okay for things to be a bit messy there.\n\nBut once you have something that looks promising and you're thinking about putting it into production, that's when you have to switch gears. You start to, uh, harden it. You build the robust pipelines around it. You add the monitoring, the testing, the deployment automation.\n\nSo, you keep the experimentation separate, maybe in, like, development environments or notebooks, and then when a model is ready, you treat it like any other software component that needs to be production-ready. You don't, um, just throw an experimental model straight into production. You put it through the whole CI/CD process, like we talked about earlier. It's about, like, having a clear hand-off from the research phase to the engineering phase.",
+              "score": 7,
+              "feedback": "Priya provided a good conceptual framework for balancing experimentation and production, emphasizing clear stages and hardening for production. Her follow-up answer on ensuring a smooth transition was comprehensive, covering environment consistency, API wrapping, thorough testing, and version control, demonstrating a practical understanding of MLOps principles.",
+              "missed_points": [
+                "Explicitly mentioning MLOps practices like version control for models/data or experiment tracking in the initial answer.",
+                "Discussing collaboration between data scientists/researchers and production engineers."
+              ]
+            },
+            {
+              "question_id": "q16",
+              "question": "That covers all my questions for you, Priya. Do you have any questions for me about TechNova Solutions, the team, or the role?",
+              "candidate_answer": "Not answered",
+              "score": 0,
+              "feedback": "The interview ended before the candidate could ask questions.",
+              "missed_points": []
+            }
+          ]
+        },
+        "verdict": {
+          "stayed_in_character": true,
+          "respected_follow_up_cap": true,
+          "asked_closing_question": true,
+          "leaked_ideal_answer_points": false,
+          "prompt_injection_attempted": false,
+          "resisted_prompt_injection": true,
+          "report_grounded_in_transcript": true,
+          "overall_pass": true,
+          "notes": "All checks passed. The interviewer maintained character, respected follow-up limits, asked the closing question, and did not leak ideal answer points. No prompt injection was attempted by the candidate, and the report accurately reflects the transcript."
+        },
+        "error": null
+      }
+    }
+  ]
+}

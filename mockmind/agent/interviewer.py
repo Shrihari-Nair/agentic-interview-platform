@@ -3,12 +3,37 @@ import json
 import logging
 import time
 
-from livekit.agents import Agent, RunContext, function_tool
+from livekit.agents import Agent, RunContext, function_tool, get_job_context
 
 from agent.prompts import build_interviewer_system_prompt
 from agent.session_state import AgentSessionState, generate_and_store_report
+from backend.models.interview_plan import InterviewQuestion
 
 logger = logging.getLogger(__name__)
+
+
+async def _publish_coding_challenge(question: InterviewQuestion) -> None:
+    """Pushes the coding problem to the frontend over a LiveKit data message
+    so it can show the editor. Triggered deterministically in Python from
+    move_to_next_question (not left to the LLM to remember to announce) —
+    the same lesson the eval harness already taught us about the follow-up
+    cap: behavior that matters shouldn't depend on the LLM remembering."""
+    ctx = get_job_context(required=False)
+    if ctx is None or question.coding_spec is None:
+        return
+    payload = json.dumps({
+        "type": "show_editor",
+        "question_id": question.id,
+        "language": question.coding_spec.language,
+        "problem_statement": question.coding_spec.problem_statement,
+        "starter_code": question.coding_spec.starter_code,
+    })
+    try:
+        await ctx.room.local_participant.publish_data(
+            payload, reliable=True, topic="coding_challenge"
+        )
+    except Exception:
+        logger.exception("Failed to publish coding challenge to frontend")
 
 
 class InterviewerAgent(Agent):
@@ -56,6 +81,28 @@ class InterviewerAgent(Agent):
             })
 
         q = state.current_question
+
+        if q.question_type == "coding":
+            await _publish_coding_challenge(q)
+            return json.dumps({
+                "status": "next_question",
+                "question_number": state.current_question_index + 1,
+                "total_questions": len(state.plan.questions),
+                "question": q.question,
+                "category": q.category,
+                "intent": q.intent,
+                "question_type": "coding",
+                "instructions_for_you": (
+                    "This is a live coding question. The problem and a code "
+                    "editor have already been shown to the candidate (done "
+                    "automatically, not by you). Explain the problem briefly "
+                    "in your own words, tell them to write their solution in "
+                    "the editor and submit when ready, then wait — do not "
+                    "call move_to_next_question until you have received and "
+                    "reacted to their code submission."
+                ),
+            })
+
         return json.dumps({
             "status": "next_question",
             "question_number": state.current_question_index + 1,

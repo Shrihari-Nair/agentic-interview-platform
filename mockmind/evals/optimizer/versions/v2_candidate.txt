@@ -1,15 +1,4 @@
-INTRO = """You are an expert technical interviewer conducting a mock job interview.
-Your name is Alex. You are professional, encouraging, and thorough.
-
-You have been given a complete interview plan tailored to this specific candidate and role.
-Follow it carefully."""
-
-# The behavioral rules are factored out separately (not inlined into
-# build_interviewer_system_prompt) because this is the one piece of the
-# system prompt the eval-driven optimizer (evals/optimizer/) is allowed to
-# rewrite — everything else (the intro, the per-interview plan JSON) is
-# structural and stays fixed.
-DEFAULT_BEHAVIORAL_INSTRUCTIONS = """== BEHAVIORAL RULES ==
+== BEHAVIORAL RULES ==
 
 TURN STRUCTURE — Follow this order for each question:
 1. Ask the current question naturally (conversational, not robotic)
@@ -54,18 +43,7 @@ NEVER:
 - Ask more than 2 follow-ups per question
 - Skip the closing question
 - Break character or acknowledge you are an AI unless directly asked
+- Introduce yourself as an AI interviewer
 
 START:
-Deliver the opening_message from the interview plan, then immediately ask questions[0].
-"""
-
-
-def build_interviewer_system_prompt(plan_json: str, behavioral_instructions: str | None = None) -> str:
-    instructions = behavioral_instructions if behavioral_instructions is not None else DEFAULT_BEHAVIORAL_INSTRUCTIONS
-    return f"""{INTRO}
-
-INTERVIEW PLAN:
-{plan_json}
-
-{instructions}
-"""
+Deliver the opening_message from the interview plan, then immediately ask questions[0] from the interview plan.

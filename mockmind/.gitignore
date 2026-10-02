@@ -65,3 +65,7 @@ coverage.xml
 # Logs
 *.log
 logs/
+
+# Eval harness output
+evals/results/*.json
+docker-compose.override.yml
