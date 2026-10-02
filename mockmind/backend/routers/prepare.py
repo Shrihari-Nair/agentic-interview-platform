@@ -18,10 +18,27 @@ from backend.models.interview_plan import SessionState
 router = APIRouter()
 
 
+async def _maybe_fetch_memory(use_memory: bool, candidate_email: str):
+    """Returns (memory_or_None, normalized_email_or_None). Never raises — a
+    memory-store problem must not block interview preparation."""
+    email = (candidate_email or "").strip()
+    if not use_memory or not email:
+        return None, None
+    try:
+        from backend.services.memory_store import get_memory
+        memory = await get_memory(email)
+        return memory, email
+    except Exception:
+        logger.exception("Failed to fetch candidate memory for %s", email)
+        return None, email
+
+
 @router.post("/api/prepare")
 async def prepare_interview(
     resume: UploadFile = File(...),
     job_description: str = Form(...),
+    use_memory: bool = Form(False),
+    candidate_email: str = Form(""),
 ):
     """
     SSE endpoint — streams preparation progress while running 3 sub-agents.
@@ -46,7 +63,7 @@ async def prepare_interview(
 
             # Stage 2: Analyze resume (Sub-Agent 1)
             yield _sse({"stage": "resume_analysis", "message": "Analyzing your background and experience...", "progress": 20, "session_id": session_id})
-            candidate_profile = await analyze_resume(resume_text)
+            candidate_profile = await analyze_resume(resume_text, session_id)
             yield _sse({
                 "stage": "resume_analysis",
                 "message": f"Profile built: {candidate_profile.years_of_experience} years experience, {len(candidate_profile.skills)} skills identified.",
@@ -57,7 +74,7 @@ async def prepare_interview(
 
             # Stage 3: Analyze JD (Sub-Agent 2)
             yield _sse({"stage": "jd_analysis", "message": "Analyzing the job requirements...", "progress": 50, "session_id": session_id})
-            job_profile = await analyze_jd(job_description)
+            job_profile = await analyze_jd(job_description, session_id)
             yield _sse({
                 "stage": "jd_analysis",
                 "message": f"Job analyzed: {job_profile.title} ({job_profile.seniority_level}). Found {len(job_profile.red_flags_to_probe)} areas to probe.",
@@ -67,7 +84,11 @@ async def prepare_interview(
 
             # Stage 4: Generate questions (Sub-Agent 3)
             yield _sse({"stage": "question_gen", "message": "Crafting personalized interview questions...", "progress": 70, "session_id": session_id})
-            plan = await generate_questions(candidate_profile, job_profile, session_id)
+            memory, normalized_email = await _maybe_fetch_memory(use_memory, candidate_email)
+            plan = await generate_questions(
+                candidate_profile, job_profile, session_id,
+                candidate_memory=memory, candidate_email=normalized_email,
+            )
             yield _sse({
                 "stage": "question_gen",
                 "message": f"Generated {len(plan.questions)} tailored questions across {len(set(q.category for q in plan.questions))} categories.",
