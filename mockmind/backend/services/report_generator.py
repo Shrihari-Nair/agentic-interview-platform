@@ -2,6 +2,7 @@ import json
 import os
 from google import genai
 from google.genai import types
+from backend.services.tracing import traced_generation
 
 REPORT_PROMPT = """
 You are an expert interview evaluator. Analyze this mock interview session thoroughly.
@@ -47,23 +48,29 @@ Return ONLY the JSON object — no markdown fences, no explanation.
 async def generate_report(session_id: str, plan: dict, transcript: list) -> dict:
     client = genai.Client(api_key=os.environ["GOOGLE_API_KEY"])
 
-    response = await client.aio.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=REPORT_PROMPT.format(
-            plan_json=json.dumps(plan, indent=2),
-            transcript_json=json.dumps(transcript, indent=2),
-        ),
-        config=types.GenerateContentConfig(
-            temperature=0.2,
-            max_output_tokens=4096,
-        ),
+    prompt = REPORT_PROMPT.format(
+        plan_json=json.dumps(plan, indent=2),
+        transcript_json=json.dumps(transcript, indent=2),
     )
 
-    raw = response.text.strip()
-    if raw.startswith("```"):
-        raw = raw.split("```")[1]
-        if raw.startswith("json"):
-            raw = raw[4:]
-        raw = raw.strip()
+    with traced_generation("report_generation", session_id=session_id, input_data=prompt) as gen:
+        response = await client.aio.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt,
+            config=types.GenerateContentConfig(
+                temperature=0.2,
+                max_output_tokens=16384,
+                response_mime_type="application/json",
+                thinking_config=types.ThinkingConfig(thinking_budget=0),
+            ),
+        )
+        gen.record_response(response)
 
-    return json.loads(raw)
+        raw = response.text.strip()
+        if raw.startswith("```"):
+            raw = raw.split("```")[1]
+            if raw.startswith("json"):
+                raw = raw[4:]
+            raw = raw.strip()
+
+        return json.loads(raw)

@@ -5,6 +5,7 @@ import re
 from google import genai
 from google.genai import types
 from backend.models.interview_plan import JobProfile
+from backend.services.tracing import traced_generation
 
 logger = logging.getLogger(__name__)
 
@@ -39,26 +40,28 @@ Return ONLY the JSON object — no markdown fences, no explanation.
 """
 
 
-async def analyze_jd(jd_text: str) -> JobProfile:
+async def analyze_jd(jd_text: str, session_id: str = "unknown") -> JobProfile:
     client = genai.Client(api_key=os.environ["GOOGLE_API_KEY"])
 
     prompt = JD_ANALYSIS_PROMPT + "\n\nJOB DESCRIPTION:\n" + jd_text
 
-    response = await client.aio.models.generate_content(
-        model="gemini-2.5-flash",
-        contents=prompt,
-        config=types.GenerateContentConfig(
-            temperature=0.1,
-            max_output_tokens=4096,
-            response_mime_type="application/json",
-            thinking_config=types.ThinkingConfig(thinking_budget=0),
-        ),
-    )
+    with traced_generation("jd_analysis", session_id=session_id, input_data=prompt) as gen:
+        response = await client.aio.models.generate_content(
+            model="gemini-2.5-flash",
+            contents=prompt,
+            config=types.GenerateContentConfig(
+                temperature=0.1,
+                max_output_tokens=4096,
+                response_mime_type="application/json",
+                thinking_config=types.ThinkingConfig(thinking_budget=0),
+            ),
+        )
+        gen.record_response(response)
 
-    raw = response.text
-    try:
-        data = json.loads(_clean_json(raw))
-    except json.JSONDecodeError as e:
-        logger.error("jd_analyzer JSON parse failed. Raw response (first 500 chars):\n%s", raw[:500])
-        raise
-    return JobProfile(**data)
+        raw = response.text
+        try:
+            data = json.loads(_clean_json(raw))
+        except json.JSONDecodeError as e:
+            logger.error("jd_analyzer JSON parse failed. Raw response (first 500 chars):\n%s", raw[:500])
+            raise
+        return JobProfile(**data)
