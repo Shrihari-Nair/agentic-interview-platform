@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional
+from typing import Literal, Optional
 from enum import Enum
 
 
@@ -17,6 +17,19 @@ class FollowUp(BaseModel):
     question: str
 
 
+class CodingTestCase(BaseModel):
+    input: str = ""  # passed to the program's stdin
+    expected_output: str = ""  # compared against stdout, stripped
+    description: str = ""
+
+
+class CodingSpec(BaseModel):
+    language: str = "python"
+    problem_statement: str
+    starter_code: str = ""
+    test_cases: list[CodingTestCase] = []
+
+
 class InterviewQuestion(BaseModel):
     id: str
     category: QuestionCategory
@@ -26,6 +39,8 @@ class InterviewQuestion(BaseModel):
     follow_ups: list[FollowUp] = []
     difficulty: int = 2
     source: str = "general"
+    question_type: Literal["conversational", "coding"] = "conversational"
+    coding_spec: Optional[CodingSpec] = None
 
 
 class CandidateProfile(BaseModel):
@@ -58,6 +73,14 @@ class InterviewPlan(BaseModel):
     interview_style: str = "conversational"
     total_duration_minutes: int = 30
     created_at: float
+    # Normalized {"basic": x, "intermediate": y, "advanced": z} weights used to
+    # select each question's difficulty level at generation time (traceability
+    # only — the live interview just reads plan.questions as before).
+    level_weights: Optional[dict] = None
+    # Set only when the candidate opted in to cross-session memory at setup.
+    # Read by agent/session_state.py's generate_and_store_report() to decide
+    # whether to update candidate memory after this session.
+    candidate_email: Optional[str] = None
 
 
 class SessionState(BaseModel):
