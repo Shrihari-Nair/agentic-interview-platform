@@ -163,6 +163,20 @@ Return a JSON object with EXACTLY this structure:
   ]
 }}
 
+IMPORTANT RULES:
+- "category" must be EXACTLY one of: behavioral, technical, situational, resume_deep_dive, culture_fit, closing — never "coding" or anything else. "coding" is a value for "question_type", a completely different field, never for "category".
+- Technical questions must reference the tech stack from BOTH resume and JD
+- Resume deep-dive questions must reference SPECIFIC projects from the resume by name
+- If there are career gaps, include one tactful question about the gap
+- Return ONLY the JSON object — no markdown fences, no explanation
+"""
+
+# Only shown to the model when coding slots are actually requested — always
+# including this unconditionally (as an earlier version of this prompt did)
+# measurably increased how often the model confused "coding" (a question_type
+# value) with "category" (which has no "coding" option), causing real,
+# frequent request failures even when zero coding questions were requested.
+_CODING_FORMAT_BLOCK = """
 For slots marked CODING in the required sequence below, set "question_type"
 to "coding" and populate "coding_spec" instead of leaving it null:
 {{
@@ -179,13 +193,9 @@ algorithm) — not a huge open-ended system design question (that's what the
 advanced conversational questions are for). Include 3-5 test cases covering
 the normal case and at least one edge case. Every test_cases[].input must be
 valid Python that calls the EXACT function name/signature given in
-starter_code.
-
-IMPORTANT RULES:
-- Technical questions must reference the tech stack from BOTH resume and JD
-- Resume deep-dive questions must reference SPECIFIC projects from the resume by name
-- If there are career gaps, include one tactful question about the gap
-- Return ONLY the JSON object — no markdown fences, no explanation
+starter_code. Remember: even for these slots, "category" is still one of the
+six category values above, NEVER "coding" — "coding" only ever goes in
+"question_type".
 """
 
 
@@ -253,6 +263,7 @@ def _build_prompt(
 
     sequence_block = "\n".join(sequence_lines)
     total = len(level_sequence)
+    coding_format_block = _CODING_FORMAT_BLOCK if coding_slots else ""
     coding_note = (
         "\nSlots marked [CODING] must have question_type=\"coding\" with a "
         "populated coding_spec, per the format described above.\n"
@@ -261,6 +272,7 @@ def _build_prompt(
 
     return (
         QUESTION_GENERATION_PROMPT
+        + coding_format_block
         + _LEVEL_FRAMEWORK
         + f"\n\n== REQUIRED QUESTION SEQUENCE ==\n\n"
         f"Generate EXACTLY {total} questions, one per slot below, in this exact "
