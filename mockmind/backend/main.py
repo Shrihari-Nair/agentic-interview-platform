@@ -7,7 +7,7 @@ load_dotenv()
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from backend.routers import prepare, session, health
+from backend.routers import prepare, session, health, memory
 from backend.services.redis_client import redis_client
 
 
@@ -31,3 +31,4 @@ app.add_middleware(
 app.include_router(health.router)
 app.include_router(prepare.router)
 app.include_router(session.router)
+app.include_router(memory.router)
