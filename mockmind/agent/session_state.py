@@ -123,3 +123,22 @@ async def generate_and_store_report(state: AgentSessionState):
     except Exception as e:
         import logging
         logging.getLogger("mockmind_agent").error(f"Report generation failed: {e}")
+        return
+
+    if state.plan.candidate_email:
+        try:
+            from backend.services.memory_store import get_memory, save_memory
+            from backend.services.memory_updater import update_memory_from_report
+
+            existing = await get_memory(state.plan.candidate_email)
+            updated = await update_memory_from_report(
+                existing=existing,
+                email=state.plan.candidate_email,
+                session_id=state.session_id,
+                plan=state.plan.model_dump(),
+                report=report,
+            )
+            await save_memory(updated)
+        except Exception as e:
+            import logging
+            logging.getLogger("mockmind_agent").error(f"Candidate memory update failed: {e}")
