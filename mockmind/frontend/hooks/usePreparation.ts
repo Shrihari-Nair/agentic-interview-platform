@@ -18,6 +18,7 @@ export function usePreparation() {
       jobDescription: string,
       useMemory: boolean = false,
       candidateEmail: string = '',
+      interviewType: 'standard' | 'coding' = 'standard',
     ) => {
       setIsRunning(true);
       setEvents([]);
@@ -29,6 +30,7 @@ export function usePreparation() {
       formData.append('resume', resumeFile);
       formData.append('job_description', jobDescription);
       formData.append('use_memory', String(useMemory));
+      formData.append('interview_type', interviewType);
       if (useMemory && candidateEmail.trim()) {
         formData.append('candidate_email', candidateEmail.trim());
       }

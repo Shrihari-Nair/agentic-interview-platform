@@ -12,6 +12,8 @@ import {
   UploadCloud,
   Loader2,
   Mic,
+  MessagesSquare,
+  Code2,
   type LucideIcon,
 } from 'lucide-react';
 import { usePreparation } from '../../hooks/usePreparation';
@@ -33,6 +35,7 @@ export default function SetupPage() {
   const [jobDescription, setJobDescription] = useState('');
   const [useMemory, setUseMemory] = useState(false);
   const [candidateEmail, setCandidateEmail] = useState('');
+  const [interviewType, setInterviewType] = useState<'standard' | 'coding'>('standard');
   const {
     events,
     currentProgress,
@@ -44,7 +47,7 @@ export default function SetupPage() {
 
   const handleStart = async () => {
     if (!resumeFile || !jobDescription.trim()) return;
-    await startPreparation(resumeFile, jobDescription, useMemory, candidateEmail);
+    await startPreparation(resumeFile, jobDescription, useMemory, candidateEmail, interviewType);
   };
 
   const handleBeginInterview = () => {
@@ -76,6 +79,44 @@ export default function SetupPage() {
           className="bg-white/5 backdrop-blur-2xl border border-white/10 rounded-3xl shadow-2xl shadow-black/40 p-8 space-y-6 animate-fade-in-up"
           style={{ animationDelay: '0.1s' }}
         >
+          {/* Interview Type Toggle */}
+          <div>
+            <label className="block text-sm font-semibold text-slate-300 mb-2">
+              Interview Type
+            </label>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => setInterviewType('standard')}
+                disabled={isRunning}
+                className={`flex items-center justify-center gap-2 rounded-xl border p-4 text-sm font-semibold transition-all duration-300 ${
+                  interviewType === 'standard'
+                    ? 'border-blue-400/50 bg-blue-500/10 text-blue-200'
+                    : 'border-white/10 bg-white/5 text-slate-400 hover:border-white/20'
+                }`}
+              >
+                <MessagesSquare className="w-4 h-4" /> Standard interview
+              </button>
+              <button
+                type="button"
+                onClick={() => setInterviewType('coding')}
+                disabled={isRunning}
+                className={`flex items-center justify-center gap-2 rounded-xl border p-4 text-sm font-semibold transition-all duration-300 ${
+                  interviewType === 'coding'
+                    ? 'border-cyan-400/50 bg-cyan-500/10 text-cyan-200'
+                    : 'border-white/10 bg-white/5 text-slate-400 hover:border-white/20'
+                }`}
+              >
+                <Code2 className="w-4 h-4" /> Coding interview
+              </button>
+            </div>
+            <p className="text-xs text-slate-500 mt-1.5">
+              {interviewType === 'standard'
+                ? 'A full mixed interview — behavioral, situational, and technical questions tailored to your resume and the job.'
+                : 'A short, code-focused interview — mostly live coding questions you solve in an in-browser editor.'}
+            </p>
+          </div>
+
           {/* Resume Upload */}
           <div>
             <label className="block text-sm font-semibold text-slate-300 mb-2">

@@ -313,7 +313,16 @@ async def generate_questions(
                 temperature=0.4,
                 max_output_tokens=16384 if coding_slots else 8192,
                 response_mime_type="application/json",
-                thinking_config=types.ThinkingConfig(thinking_budget=0),
+                # Coding slots add a hard per-slot binary tag (question_type
+                # must be "coding") on top of the existing per-slot category/
+                # difficulty constraints. With thinking disabled (budget=0),
+                # real testing showed the model dropping that tag on roughly
+                # 1 in 4 requested slots; dynamic thinking (-1) measured 0
+                # misses across 6 trials. Not needed when there are no
+                # coding slots to track, so keep that path fast/cheap.
+                thinking_config=types.ThinkingConfig(
+                    thinking_budget=-1 if coding_slots else 0
+                ),
             ),
         )
         gen.record_response(response)

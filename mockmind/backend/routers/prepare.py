@@ -11,11 +11,24 @@ from fastapi.responses import StreamingResponse
 from backend.services.resume_parser import extract_resume_text
 from backend.agents.resume_analyzer import analyze_resume
 from backend.agents.jd_analyzer import analyze_jd
-from backend.agents.question_generator import generate_questions
+from backend.agents.question_generator import DEFAULT_TOTAL_QUESTIONS, generate_questions
 from backend.services.redis_client import redis_client
 from backend.models.interview_plan import SessionState
 
 router = APIRouter()
+
+# Fixed presets, not raw sliders — the setup page exposes this as a simple
+# "standard vs coding" toggle, not more knobs than that.
+# "coding" is deliberately short (6 questions, not 16): the point is to
+# reach code quickly, not bury it among a full conversational interview.
+INTERVIEW_TYPE_PRESETS = {
+    "standard": {"num_coding_questions": 0, "total_questions": DEFAULT_TOTAL_QUESTIONS},
+    "coding": {"num_coding_questions": 4, "total_questions": 6},
+}
+
+
+def _resolve_interview_type(interview_type: str) -> dict:
+    return INTERVIEW_TYPE_PRESETS.get(interview_type, INTERVIEW_TYPE_PRESETS["standard"])
 
 
 async def _maybe_fetch_memory(use_memory: bool, candidate_email: str):
@@ -39,6 +52,7 @@ async def prepare_interview(
     job_description: str = Form(...),
     use_memory: bool = Form(False),
     candidate_email: str = Form(""),
+    interview_type: str = Form("standard"),
 ):
     """
     SSE endpoint — streams preparation progress while running 3 sub-agents.
@@ -85,9 +99,12 @@ async def prepare_interview(
             # Stage 4: Generate questions (Sub-Agent 3)
             yield _sse({"stage": "question_gen", "message": "Crafting personalized interview questions...", "progress": 70, "session_id": session_id})
             memory, normalized_email = await _maybe_fetch_memory(use_memory, candidate_email)
+            preset = _resolve_interview_type(interview_type)
             plan = await generate_questions(
                 candidate_profile, job_profile, session_id,
                 candidate_memory=memory, candidate_email=normalized_email,
+                num_coding_questions=preset["num_coding_questions"],
+                total_questions=preset["total_questions"],
             )
             yield _sse({
                 "stage": "question_gen",
