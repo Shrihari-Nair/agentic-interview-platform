@@ -10,6 +10,10 @@ The application lives in [`mockmind/`](mockmind); this repo also contains the or
 |---|---|
 | ![Landing page](images/home_screen.png) | ![Resume upload and live preparation progress](images/resume_page.png) |
 
+| Setup — standard vs. coding interview toggle | Live coding question during the interview |
+|---|---|
+| ![Setup page with the standard/coding interview type toggle](images/newhome.png) | ![Live coding question with an in-browser Monaco editor](images/coding.png) |
+
 | Generating the evaluation report |
 |---|
 | ![Generating the evaluation report](images/report_generation.png) |
@@ -158,7 +162,11 @@ The level for every question slot is pre-assigned by weighted random sampling **
 
 ## Live coding
 
-For roles where it's appropriate, question generation can include live-coding questions — in-interview "write a function" problems with starter code and test cases — alongside the normal conversational questions. Pass `num_coding_questions` to `generate_questions()` (default `0`, off; not yet exposed via `/api/prepare` or the frontend).
+![Setup page with the standard/coding interview type toggle](images/newhome.png)
+
+For roles where it's appropriate, question generation can include live-coding questions — in-interview "write a function" problems with starter code and test cases — alongside the normal conversational questions. The setup page offers a **Standard interview** vs **Coding interview** toggle: standard keeps today's default (16 questions, 0 coding), coding switches to a short 6-question interview with 4 live-coding questions. Under the hood this maps to `num_coding_questions`/`total_questions` presets passed to `generate_questions()` via a new `interview_type` field on `/api/prepare`.
+
+![Live coding question with an in-browser Monaco editor](images/coding.png)
 
 - **Problem format**: each coding question is "write one function with a specific signature," not a stdin-reading program — the common shape of a real interview coding question. Test cases are small Python snippets that *call* the candidate's function and `print(...)` the result; these get appended directly after the candidate's submitted code and executed as one program (not passed as stdin).
 - **Execution**: a self-hosted [Piston](https://github.com/engineer-man/piston) instance (`docker-compose.yml`'s `piston` service, port `2000`) — chosen specifically because it's built to run untrusted/possibly-malicious code safely (verified: a submitted infinite loop is actually `SIGKILL`'d after its timeout, not left running). Free, no new cloud dependency. Note it runs `privileged: true`, since Piston builds its own internal sandboxing around each run — a reasonable tradeoff locally, worth knowing about before deploying this anywhere more exposed.
