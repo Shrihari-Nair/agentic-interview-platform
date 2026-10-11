@@ -63,11 +63,12 @@ export default function SetupPage() {
   return (
     <main className="relative min-h-screen overflow-hidden flex items-center justify-center p-6">
       <AuroraBackground subtle />
+      <div className="bg-grid pointer-events-none absolute inset-0 -z-10" aria-hidden />
 
       <div className="relative z-10 w-full max-w-2xl">
         {/* Header */}
         <div className="text-center mb-8 animate-fade-in-up">
-          <h1 className="font-display text-4xl font-bold bg-gradient-to-r from-blue-400 via-cyan-300 to-blue-400 bg-clip-text text-transparent">
+          <h1 className="font-display text-4xl font-bold text-shimmer bg-gradient-to-r from-blue-400 via-cyan-300 to-violet-400 bg-clip-text text-transparent">
             MockMind
           </h1>
           <p className="text-slate-400 mt-2">
@@ -76,7 +77,7 @@ export default function SetupPage() {
         </div>
 
         <div
-          className="bg-white/5 backdrop-blur-2xl border border-white/10 rounded-3xl shadow-2xl shadow-black/40 p-8 space-y-6 animate-fade-in-up"
+          className="glow-border glow-border-always bg-slate-900/60 backdrop-blur-2xl border border-white/10 rounded-3xl shadow-2xl shadow-black/40 p-8 space-y-6 animate-fade-in-up"
           style={{ animationDelay: '0.1s' }}
         >
           {/* Interview Type Toggle */}
@@ -288,7 +289,7 @@ export default function SetupPage() {
             <button
               onClick={handleStart}
               disabled={!canSubmit}
-              className="w-full py-4 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 disabled:from-white/10 disabled:to-white/10 disabled:text-slate-500 disabled:shadow-none disabled:cursor-not-allowed disabled:hover:scale-100 text-white font-bold text-lg rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] shadow-xl shadow-blue-600/20"
+              className="w-full py-4 bg-gradient-to-r from-blue-600 via-violet-600 to-cyan-500 hover:brightness-110 disabled:from-white/10 disabled:to-white/10 disabled:text-slate-500 disabled:shadow-none disabled:cursor-not-allowed disabled:hover:scale-100 text-white font-bold text-lg rounded-xl transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] shadow-xl shadow-violet-600/30"
             >
               {isRunning ? (
                 <span className="flex items-center justify-center gap-2">

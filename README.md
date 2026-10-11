@@ -1,6 +1,50 @@
+<div align="center">
+
 # MockMind
 
-MockMind is an AI-powered voice mock-interview platform. A candidate uploads their resume and pastes a job description, an LLM pipeline generates a tailored interview question bank, the candidate then does a live spoken interview with an AI interviewer over LiveKit, and finally receives a scored feedback report.
+**Ace the interview before it counts.**
+
+AI-powered voice mock interviews, personalized to your resume and the job you want, with a scored feedback report at the end.
+
+![Next.js](https://img.shields.io/badge/Next.js-14-000000?logo=nextdotjs&logoColor=white)
+![FastAPI](https://img.shields.io/badge/FastAPI-009688?logo=fastapi&logoColor=white)
+![LiveKit](https://img.shields.io/badge/LiveKit-Agents-6C47FF)
+![Gemini](https://img.shields.io/badge/Gemini-2.5%20Flash-4285F4?logo=googlegemini&logoColor=white)
+![Redis](https://img.shields.io/badge/Redis-7-DC382D?logo=redis&logoColor=white)
+
+[Demo](#demo) · [Features](#features) · [Quick start](#quick-start) · [How it works](#how-it-works) · [Architecture](#architecture) · [Evals](#eval-harness)
+
+</div>
+
+## Demo
+
+<div align="center">
+
+[![Watch the MockMind demo (23s)](images/mockmind-demo.jpg)](images/mockmind-demo.mp4)
+
+*Click to watch the 23-second demo: setup, live voice interview, scored report. The resume, question and scores shown are illustrative.*
+
+</div>
+
+## Features
+
+- **Tailored to you**: three Gemini sub-agents analyze your resume and the job description, then generate a question bank with a guaranteed mix of basic, intermediate and advanced questions ([details](#question-difficulty-levels)).
+- **Real voice interview**: a LiveKit-hosted AI interviewer speaks the questions, listens, and asks natural follow-ups (Soniox STT, Gemini LLM, Cartesia TTS).
+- **Live coding**: switch to a coding interview and solve problems in an in-browser Monaco editor. Code runs in a sandboxed Piston instance and is graded against real test results ([details](#live-coding)).
+- **Remembers where you struggle**: opt in and future interviews lean toward your historically weak categories ([details](#cross-session-candidate-memory)).
+- **Scored report**: overall score, category breakdown, strengths, per-question feedback and a hiring recommendation.
+- **Tested like a product**: an eval harness with simulated candidates and an LLM judge, plus a prompt optimizer, guard the interviewer's behavior ([details](#eval-harness)).
+- **Observable**: optional self-hosted Langfuse traces every LLM call, grouped per session ([details](#observability)).
+
+## Quick start
+
+```bash
+cp mockmind/.env.example mockmind/.env                              # add your API keys
+cp mockmind/frontend/.env.local.example mockmind/frontend/.env.local
+cd mockmind && docker compose up --build
+```
+
+Open **http://localhost:3000**. You will need keys for LiveKit Cloud, Gemini, Cartesia and Soniox. See [Configuration](#configuration) for the full list.
 
 The application lives in [`mockmind/`](mockmind); this repo also contains the original design spec, [`MOCK_INTERVIEW_PLATFORM.md`](MOCK_INTERVIEW_PLATFORM.md).
 

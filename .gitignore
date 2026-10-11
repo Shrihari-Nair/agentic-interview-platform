@@ -1,0 +1,8 @@
+# Third-party agent skills (reinstallable; see skills-lock.json / README)
+.claude/skills/
+.claude/settings.local.json
+.agents/
+
+# /brag video workspace (renders, composition, audio assets)
+brag-output/
+brag-output-*/
