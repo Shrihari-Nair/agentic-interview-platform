@@ -20,9 +20,9 @@ AI-powered voice mock interviews, personalized to your resume and the job you wa
 
 <div align="center">
 
-[![Watch the MockMind demo (23s)](images/mockmind-demo.jpg)](images/mockmind-demo.mp4)
+![MockMind demo: setup, live voice interview, scored report](images/mockmind-demo.gif)
 
-*Click to watch the 23-second demo: setup, live voice interview, scored report. The resume, question and scores shown are illustrative.*
+*23-second demo: setup, live voice interview, scored report. The resume, question and scores shown are illustrative. [Watch the full-quality video with sound](images/mockmind-demo.mp4).*
 
 </div>
 
