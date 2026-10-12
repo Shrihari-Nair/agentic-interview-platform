@@ -31,6 +31,7 @@ from backend.models.interview_plan import (
 )
 from backend.models.candidate_memory import CandidateMemory
 from backend.services.tracing import traced_generation
+from backend.services.llm_retry import retry_async
 
 # ── Difficulty levels ──────────────────────────────────────────────────────
 # Maps directly onto InterviewQuestion.difficulty (1/2/3) — no schema change,
@@ -74,7 +75,7 @@ near-identical questions at the same level about the same topic.
 _QUESTION_CATEGORIES = {"behavioral", "technical", "situational", "resume_deep_dive"}
 
 
-def _build_memory_context(memory: CandidateMemory | None) -> str:
+def _build_memory_context(memory: CandidateMemory | None, weak_focus: bool = False) -> str:
     """Soft, qualitative bias from a returning candidate's history — not a
     hard quota like the difficulty-level sequence, since "weak category" is
     a fuzzier signal than a clean 3-way enum. Never injected into the live
@@ -92,6 +93,12 @@ def _build_memory_context(memory: CandidateMemory | None) -> str:
             f"selection toward these areas more than the usual mix, without "
             f"abandoning balanced coverage entirely.\n"
         )
+        if weak_focus:
+            lines.append(
+                "PRACTICE MODE: the candidate asked to drill their weak areas. "
+                "At least two thirds of the questions between the fixed opening "
+                f"and closing questions MUST come from: {', '.join(question_weak)}.\n"
+            )
     if "communication" in memory.weak_categories:
         lines.append(
             "This candidate has also had communication/clarity issues in "
@@ -287,7 +294,7 @@ def _build_prompt(
     )
 
 
-async def generate_questions(
+async def _generate_questions_once(
     candidate: CandidateProfile,
     job: JobProfile,
     session_id: str,
@@ -296,6 +303,7 @@ async def generate_questions(
     num_coding_questions: int = 0,
     candidate_memory: CandidateMemory | None = None,
     candidate_email: str | None = None,
+    weak_focus: bool = False,
 ) -> InterviewPlan:
     normalized_weights = _normalize_level_weights(level_weights)
     level_sequence = _assign_level_sequence(total_questions, normalized_weights)
@@ -303,7 +311,7 @@ async def generate_questions(
 
     client = genai.Client(api_key=os.environ["GOOGLE_API_KEY"])
     prompt = _build_prompt(candidate, job, level_sequence, coding_slots)
-    prompt += _build_memory_context(candidate_memory)
+    prompt += _build_memory_context(candidate_memory, weak_focus)
 
     with traced_generation("question_generation", session_id=session_id, input_data=prompt) as gen:
         response = await client.aio.models.generate_content(
@@ -397,4 +405,10 @@ async def generate_questions(
         created_at=time.time(),
         level_weights=normalized_weights,
         candidate_email=candidate_email,
+    )
+
+
+async def generate_questions(*args, **kwargs) -> InterviewPlan:
+    return await retry_async(
+        lambda: _generate_questions_once(*args, **kwargs), label="question_generation"
     )

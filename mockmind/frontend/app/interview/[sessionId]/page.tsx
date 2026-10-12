@@ -8,24 +8,79 @@ import {
   useDataChannel,
   useVoiceAssistant,
   useRoomContext,
+  useConnectionState,
 } from '@livekit/components-react';
+import { ConnectionState } from 'livekit-client';
 import '@livekit/components-styles';
-import { Mic, CheckCircle2 } from 'lucide-react';
+import { Mic, MicOff, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { getSessionToken } from '../../../lib/api';
 import type { SessionTokenData } from '../../../types/interview';
 import { AuroraBackground } from '../../../components/AuroraBackground';
 import { CodeEditorPanel, type CodingChallenge } from '../../../components/CodeEditorPanel';
 
+type MicState = 'checking' | 'granted' | 'denied' | 'unsupported';
+
+/** Ask for the mic *before* joining the room, so a blocked/missing microphone
+ * shows a clear fix instead of an interview that silently can't hear you. */
+async function checkMicrophone(): Promise<MicState> {
+  if (!navigator.mediaDevices?.getUserMedia) return 'unsupported';
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    stream.getTracks().forEach((t) => t.stop());
+    return 'granted';
+  } catch {
+    return 'denied';
+  }
+}
+
 export default function InterviewPage() {
   const { sessionId } = useParams() as { sessionId: string };
   const [tokenData, setTokenData] = useState<SessionTokenData | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [mic, setMic] = useState<MicState>('checking');
+  const [attempt, setAttempt] = useState(0);
 
   useEffect(() => {
-    getSessionToken(sessionId)
-      .then(setTokenData)
-      .catch((e) => setError(e.message));
-  }, [sessionId]);
+    let cancelled = false;
+    setMic('checking');
+    setError(null);
+    checkMicrophone().then((result) => {
+      if (cancelled) return;
+      setMic(result);
+      if (result !== 'granted') return;
+      getSessionToken(sessionId)
+        .then((t) => !cancelled && setTokenData(t))
+        .catch((e) => !cancelled && setError(e.message));
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [sessionId, attempt]);
+
+  if (mic === 'denied' || mic === 'unsupported') {
+    return (
+      <div className="relative flex items-center justify-center min-h-screen bg-slate-900 text-white overflow-hidden p-6">
+        <AuroraBackground subtle />
+        <div className="relative z-10 text-center space-y-4 max-w-md">
+          <MicOff className="w-12 h-12 mx-auto text-amber-400" />
+          <h2 className="font-display text-2xl font-bold">
+            {mic === 'denied' ? 'Microphone access is blocked' : 'Microphone not available'}
+          </h2>
+          <p className="text-slate-400">
+            {mic === 'denied'
+              ? 'MockMind is a voice interview, so it needs your microphone. Click the lock or camera icon in your browser’s address bar, allow the microphone for this site, then try again.'
+              : 'This browser can’t access a microphone here. Use a current version of Chrome, Edge, Safari or Firefox, and open the site over HTTPS (or localhost).'}
+          </p>
+          <button
+            onClick={() => setAttempt((n) => n + 1)}
+            className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-semibold rounded-xl transition-all duration-300 hover:scale-[1.03] active:scale-[0.98]"
+          >
+            Try again
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   if (error) {
     return (
@@ -33,6 +88,12 @@ export default function InterviewPage() {
         <div className="text-center">
           <p className="text-xl font-semibold mb-2">Connection error</p>
           <p className="text-sm">{error}</p>
+          <button
+            onClick={() => setAttempt((n) => n + 1)}
+            className="mt-4 px-4 py-2 border border-white/15 text-slate-200 rounded-xl text-sm hover:bg-white/5"
+          >
+            Try again
+          </button>
         </div>
       </div>
     );
@@ -44,7 +105,7 @@ export default function InterviewPage() {
         <AuroraBackground subtle />
         <div className="relative z-10 text-center space-y-3">
           <Mic className="w-10 h-10 mx-auto animate-pulse text-blue-400" />
-          <p>Connecting to interview room...</p>
+          <p>{mic === 'checking' ? 'Checking your microphone...' : 'Connecting to interview room...'}</p>
         </div>
       </div>
     );
@@ -258,6 +319,9 @@ function InterviewRoomUI({ sessionId }: { sessionId: string }) {
   const router = useRouter();
   const [isEnded, setIsEnded] = useState(false);
   const [challenge, setChallenge] = useState<CodingChallenge | null>(null);
+  const connectionState = useConnectionState();
+  const [agentTimedOut, setAgentTimedOut] = useState(false);
+  const [wasConnected, setWasConnected] = useState(false);
 
   useDataChannel('coding_challenge', (msg) => {
     try {
@@ -294,6 +358,24 @@ function InterviewRoomUI({ sessionId }: { sessionId: string }) {
 
   const cfg = ORB_CONFIG[orbState];
 
+  // If the interviewer agent never joins (e.g. the agent worker is down), say
+  // so after a grace period instead of showing "Connecting…" forever.
+  useEffect(() => {
+    if (orbState !== 'disconnected') {
+      setAgentTimedOut(false);
+      return;
+    }
+    const t = setTimeout(() => setAgentTimedOut(true), 25_000);
+    return () => clearTimeout(t);
+  }, [orbState]);
+
+  useEffect(() => {
+    if (connectionState === ConnectionState.Connected) setWasConnected(true);
+  }, [connectionState]);
+
+  const connectionLost =
+    wasConnected && !isEnded && connectionState === ConnectionState.Disconnected;
+
   const handleEndInterview = () => {
     setIsEnded(true);
     room.disconnect();
@@ -307,7 +389,7 @@ function InterviewRoomUI({ sessionId }: { sessionId: string }) {
       <AuroraBackground subtle />
 
       {/* Header */}
-      <header className="relative z-10 flex items-center justify-between px-6 py-4 border-b border-white/10">
+      <header className="relative z-10 flex flex-wrap items-center justify-between gap-3 px-4 sm:px-6 py-4 border-b border-white/10">
         <div>
           <h1 className="font-display text-xl font-bold tracking-tight">MockMind</h1>
           <p className="text-slate-500 text-xs mt-0.5">
@@ -348,6 +430,39 @@ function InterviewRoomUI({ sessionId }: { sessionId: string }) {
           )}
         </div>
       </div>
+
+      {/* Interviewer never showed up / connection dropped */}
+      {!isEnded && (agentTimedOut || connectionLost) && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-900/90 border border-white/10 rounded-3xl p-8 text-center max-w-sm space-y-4">
+            <AlertTriangle className="w-12 h-12 text-amber-400 mx-auto" />
+            <h2 className="font-display text-xl font-bold">
+              {connectionLost ? 'Connection lost' : 'The interviewer is taking too long to join'}
+            </h2>
+            <p className="text-slate-400 text-sm">
+              {connectionLost
+                ? 'You were disconnected. Your answers so far are saved.'
+                : 'Something went wrong starting your interview. Please try again.'}
+            </p>
+            <div className="flex gap-3 justify-center">
+              <button
+                onClick={() => window.location.reload()}
+                className="px-4 py-2 bg-gradient-to-r from-blue-600 to-cyan-500 text-white font-semibold rounded-xl text-sm"
+              >
+                Reconnect
+              </button>
+              {connectionLost && (
+                <button
+                  onClick={() => router.push(`/report/${sessionId}`)}
+                  className="px-4 py-2 border border-white/15 text-slate-200 rounded-xl text-sm hover:bg-white/5"
+                >
+                  Get my report
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Live coding editor */}
       {challenge && <CodeEditorPanel challenge={challenge} onSubmit={handleSubmitCode} />}

@@ -32,7 +32,9 @@ AI-powered voice mock interviews, personalized to your resume and the job you wa
 - **Real voice interview**: a LiveKit-hosted AI interviewer speaks the questions, listens, and asks natural follow-ups (Soniox STT, Gemini LLM, Cartesia TTS).
 - **Live coding**: switch to a coding interview and solve problems in an in-browser Monaco editor. Code runs in a sandboxed Piston instance and is graded against real test results ([details](#live-coding)).
 - **Remembers where you struggle**: opt in and future interviews lean toward your historically weak categories ([details](#cross-session-candidate-memory)).
-- **Scored report**: overall score, category breakdown, strengths, per-question feedback and a hiring recommendation.
+- **Scored report**: overall score, category breakdown, strengths, per-question feedback and a hiring recommendation. Save it as a PDF from the report page.
+- **Your interview, your way**: choose quick (8 questions) or standard (16), easier / balanced / harder difficulty, or a coding interview. Opted-in returning candidates can run a practice mode that drills their weak areas.
+- **Fails gracefully**: LLM calls retry with backoff, uploads are validated, the transcript is saved as you go, a failed report can be retried with one click, and the UI explains a blocked microphone or an interviewer that never joins.
 - **Tested like a product**: an eval harness with simulated candidates and an LLM judge, plus a prompt optimizer, guard the interviewer's behavior ([details](#eval-harness)).
 - **Observable**: optional self-hosted Langfuse traces every LLM call, grouped per session ([details](#observability)).
 
@@ -93,7 +95,8 @@ The FastAPI backend and the LiveKit agent are separate processes that never call
 |---|---|---|
 | `POST` | `/api/prepare` | SSE endpoint — analyzes resume + JD and generates the interview plan |
 | `POST` | `/api/token` | Mints a LiveKit access token and dispatches the interviewer agent to the room |
-| `GET` | `/api/report/{session_id}` | Polls for the generated evaluation report |
+| `GET` | `/api/report/{session_id}` | Polls for the evaluation report: `200` ready, `404` still generating, `502` generation failed |
+| `POST` | `/api/report/{session_id}/retry` | Regenerates a failed report from the transcript saved in Redis |
 | `DELETE` | `/api/candidate-memory` | "Forget me" — deletes a candidate's cross-session memory by email |
 | `GET` | `/health` | Health check |
 
@@ -192,6 +195,22 @@ openssl rand -hex 16   # -> SALT, NEXTAUTH_SECRET, POSTGRES/CLICKHOUSE/MINIO pas
 
 Then `docker compose up` and open **http://localhost:3001** to browse traces (log in with `LANGFUSE_INIT_USER_EMAIL` / `LANGFUSE_INIT_USER_PASSWORD`).
 
+## Reliability
+
+| Failure | What happens |
+|---|---|
+| Gemini 429/5xx or malformed JSON | Resume/JD analysis, question generation and report generation each retry up to 3 times with backoff (`backend/services/llm_retry.py`). Reports are schema-validated before they are stored. |
+| Report generation fails | Status is stored in Redis (`pending` / `ready` / `failed`). The report page shows a *Try again* button that calls `POST /api/report/{id}/retry`. |
+| Agent crashes or the candidate drops mid-interview | The transcript (both sides) is autosaved to Redis, so the report can still be generated or retried. The UI shows "Connection lost" with *Reconnect* / *Get my report*. |
+| Interviewer agent never joins | After 25 s the interview page says so instead of showing "Connecting…" forever. |
+| Microphone blocked or missing | Checked before joining the room, with instructions to fix it. |
+| Bad uploads | Resumes are limited to 5 MB and PDF/DOCX/TXT; resume text and job descriptions are length-capped. Unexpected server errors show a generic message (details stay in the logs). |
+| More than 2 follow-ups on one question | Enforced in code: candidate turns are counted per question and the interviewer is told, every turn, when the limit is reached. |
+
+## CI
+
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs on every push to `main` and every pull request: the Python tests (no Redis, network or API keys needed) and a frontend typecheck + production build. Run the tests locally with `cd mockmind && python -m pytest backend/tests`.
+
 ## Question difficulty levels
 
 Question generation (`backend/agents/question_generator.py`) targets a configurable mix of three difficulty levels, mapped onto the existing `InterviewQuestion.difficulty` field (1/2/3) rather than a new schema concept:
@@ -202,7 +221,7 @@ Question generation (`backend/agents/question_generator.py`) targets a configura
 | Intermediate / Technical Depth | 2 | Practical understanding — connects the concept to the candidate's own project (e.g. "How does LiveKit use WebRTC, and why did you choose it?") |
 | Advanced / Project & Architecture | 3 | The candidate's actual architecture, trade-offs, and failure handling (e.g. "Walk me through the architecture of the system you built with it.") |
 
-The level for every question slot is pre-assigned by weighted random sampling **in Python, before the LLM call** — not left to the model's discretion — so the configured distribution is a guarantee, not a suggestion. The first slot is always the fixed warm-up question and the last is always the fixed closing question; weights only govern the slots in between. Pass `level_weights={"basic": ..., "intermediate": ..., "advanced": ...}` (must sum to 1.0, auto-normalized otherwise) and `total_questions` to `generate_questions()` — both default (`0.4/0.35/0.25`, 16 questions) if omitted. The achieved distribution is logged, and the normalized weights used are persisted onto `InterviewPlan.level_weights` for traceability. Not yet exposed through `/api/prepare` or the frontend — defaults only, for now.
+The level for every question slot is pre-assigned by weighted random sampling **in Python, before the LLM call** — not left to the model's discretion — so the configured distribution is a guarantee, not a suggestion. The first slot is always the fixed warm-up question and the last is always the fixed closing question; weights only govern the slots in between. Pass `level_weights={"basic": ..., "intermediate": ..., "advanced": ...}` (must sum to 1.0, auto-normalized otherwise) and `total_questions` to `generate_questions()` — both default (`0.4/0.35/0.25`, 16 questions) if omitted. The achieved distribution is logged, and the normalized weights used are persisted onto `InterviewPlan.level_weights` for traceability. The setup page exposes this as an Easier / Balanced / Harder choice (`difficulty` on `/api/prepare`), and the number of questions as Quick / Standard (`length`).
 
 ## Live coding
 

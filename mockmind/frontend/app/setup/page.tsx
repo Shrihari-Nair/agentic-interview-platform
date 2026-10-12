@@ -16,8 +16,68 @@ import {
   Code2,
   type LucideIcon,
 } from 'lucide-react';
-import { usePreparation } from '../../hooks/usePreparation';
+import { usePreparation, type PrepOptions } from '../../hooks/usePreparation';
 import { AuroraBackground } from '../../components/AuroraBackground';
+
+// Must match the limits enforced in backend/routers/prepare.py.
+const MAX_RESUME_BYTES = 5 * 1024 * 1024;
+const MAX_JD_CHARS = 15_000;
+const ALLOWED_EXTS = ['.pdf', '.docx', '.doc', '.txt'];
+
+const LENGTH_OPTIONS: { value: PrepOptions['length']; label: string; hint: string }[] = [
+  { value: 'quick', label: 'Quick', hint: '8 questions' },
+  { value: 'standard', label: 'Standard', hint: '16 questions' },
+];
+const DIFFICULTY_OPTIONS: { value: PrepOptions['difficulty']; label: string; hint: string }[] = [
+  { value: 'easier', label: 'Easier', hint: 'More fundamentals' },
+  { value: 'balanced', label: 'Balanced', hint: 'Default mix' },
+  { value: 'harder', label: 'Harder', hint: 'More architecture & trade-offs' },
+];
+
+function Segmented<T extends string>({
+  label,
+  value,
+  options,
+  onChange,
+  disabled,
+}: {
+  label: string;
+  value: T;
+  options: { value: T; label: string; hint: string }[];
+  onChange: (v: T) => void;
+  disabled?: boolean;
+}) {
+  return (
+    <div>
+      <label className="block text-sm font-semibold text-slate-300 mb-2">{label}</label>
+      <div
+        role="radiogroup"
+        aria-label={label}
+        className="grid gap-2"
+        style={{ gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))` }}
+      >
+        {options.map((o) => (
+          <button
+            key={o.value}
+            type="button"
+            role="radio"
+            aria-checked={value === o.value}
+            disabled={disabled}
+            onClick={() => onChange(o.value)}
+            className={`rounded-xl border px-3 py-2.5 text-left transition-all duration-300 disabled:opacity-60 ${
+              value === o.value
+                ? 'border-blue-400/50 bg-blue-500/10 text-blue-100'
+                : 'border-white/10 bg-white/5 text-slate-400 hover:border-white/20'
+            }`}
+          >
+            <span className="block text-sm font-semibold">{o.label}</span>
+            <span className="block text-xs text-slate-500">{o.hint}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 const STAGE_CONFIG: Record<string, { icon: LucideIcon; label: string }> = {
   parsing: { icon: FileText, label: 'Parsing resume' },
@@ -36,6 +96,10 @@ export default function SetupPage() {
   const [useMemory, setUseMemory] = useState(false);
   const [candidateEmail, setCandidateEmail] = useState('');
   const [interviewType, setInterviewType] = useState<'standard' | 'coding'>('standard');
+  const [length, setLength] = useState<PrepOptions['length']>('standard');
+  const [difficulty, setDifficulty] = useState<PrepOptions['difficulty']>('balanced');
+  const [focusWeakAreas, setFocusWeakAreas] = useState(false);
+  const [fileError, setFileError] = useState<string | null>(null);
   const {
     events,
     currentProgress,
@@ -47,7 +111,11 @@ export default function SetupPage() {
 
   const handleStart = async () => {
     if (!resumeFile || !jobDescription.trim()) return;
-    await startPreparation(resumeFile, jobDescription, useMemory, candidateEmail, interviewType);
+    await startPreparation(resumeFile, jobDescription, useMemory, candidateEmail, interviewType, {
+      difficulty,
+      length,
+      focusWeakAreas: useMemory && focusWeakAreas,
+    });
   };
 
   const handleBeginInterview = () => {
@@ -58,7 +126,30 @@ export default function SetupPage() {
 
   const isReady = sessionInfo !== null;
   const canSubmit =
-    !!resumeFile && jobDescription.trim().length > 50 && !isRunning;
+    !!resumeFile &&
+    !fileError &&
+    jobDescription.trim().length > 50 &&
+    jobDescription.length <= MAX_JD_CHARS &&
+    !isRunning;
+
+  const handleFile = (file: File | null) => {
+    if (!file) {
+      setResumeFile(null);
+      setFileError(null);
+      return;
+    }
+    const ext = file.name.slice(file.name.lastIndexOf('.')).toLowerCase();
+    if (!ALLOWED_EXTS.includes(ext)) {
+      setResumeFile(null);
+      setFileError('Unsupported file type — upload a PDF, DOCX or TXT resume.');
+    } else if (file.size > MAX_RESUME_BYTES) {
+      setResumeFile(null);
+      setFileError('That file is too large — the limit is 5 MB.');
+    } else {
+      setResumeFile(file);
+      setFileError(null);
+    }
+  };
 
   return (
     <main className="relative min-h-screen overflow-hidden flex items-center justify-center p-6">
@@ -77,7 +168,7 @@ export default function SetupPage() {
         </div>
 
         <div
-          className="glow-border glow-border-always bg-slate-900/60 backdrop-blur-2xl border border-white/10 rounded-3xl shadow-2xl shadow-black/40 p-8 space-y-6 animate-fade-in-up"
+          className="glow-border glow-border-always bg-slate-900/60 backdrop-blur-2xl border border-white/10 rounded-3xl shadow-2xl shadow-black/40 p-5 sm:p-8 space-y-6 animate-fade-in-up"
           style={{ animationDelay: '0.1s' }}
         >
           {/* Interview Type Toggle */}
@@ -118,6 +209,28 @@ export default function SetupPage() {
             </p>
           </div>
 
+          {/* Length (standard only — coding interviews have a fixed short format) + difficulty */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {interviewType === 'standard' && (
+              <Segmented
+                label="Length"
+                value={length}
+                options={LENGTH_OPTIONS}
+                onChange={setLength}
+                disabled={isRunning}
+              />
+            )}
+            <div className={interviewType === 'standard' ? '' : 'sm:col-span-2'}>
+              <Segmented
+                label="Difficulty"
+                value={difficulty}
+                options={DIFFICULTY_OPTIONS}
+                onChange={setDifficulty}
+                disabled={isRunning}
+              />
+            </div>
+          </div>
+
           {/* Resume Upload */}
           <div>
             <label className="block text-sm font-semibold text-slate-300 mb-2">
@@ -135,7 +248,7 @@ export default function SetupPage() {
                 ref={fileInputRef}
                 type="file"
                 accept=".pdf,.docx,.doc,.txt"
-                onChange={(e) => setResumeFile(e.target.files?.[0] || null)}
+                onChange={(e) => handleFile(e.target.files?.[0] || null)}
                 className="hidden"
               />
               {resumeFile ? (
@@ -162,6 +275,12 @@ export default function SetupPage() {
             </div>
           </div>
 
+          {fileError && (
+            <p role="alert" className="text-sm text-red-300 -mt-3">
+              {fileError}
+            </p>
+          )}
+
           {/* Job Description */}
           <div>
             <label className="block text-sm font-semibold text-slate-300 mb-2">
@@ -176,7 +295,7 @@ export default function SetupPage() {
               disabled={isRunning}
             />
             <p className="text-xs text-slate-500 mt-1">
-              {jobDescription.length} characters
+              {jobDescription.length.toLocaleString()} / {MAX_JD_CHARS.toLocaleString()} characters
               {jobDescription.length < 50 && jobDescription.length > 0 && (
                 <span className="text-amber-400 ml-2">
                   (paste a longer job description for best results)
@@ -200,6 +319,24 @@ export default function SetupPage() {
                 will focus more on areas I&apos;ve historically struggled with.
               </span>
             </label>
+            {useMemory && (
+              <label className="flex items-start gap-2.5 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={focusWeakAreas}
+                  onChange={(e) => setFocusWeakAreas(e.target.checked)}
+                  disabled={isRunning}
+                  className="mt-0.5 w-4 h-4 rounded border-white/20 bg-white/5 accent-blue-500"
+                />
+                <span className="text-sm text-slate-300">
+                  Practice mode — focus this interview on my weak areas.
+                  <span className="block text-xs text-slate-500">
+                    Needs at least one past session with this email; otherwise
+                    you&apos;ll get a balanced interview.
+                  </span>
+                </span>
+              </label>
+            )}
             {useMemory && (
               <input
                 type="email"

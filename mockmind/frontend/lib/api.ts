@@ -22,11 +22,28 @@ export async function getSessionToken(
   return res.json();
 }
 
-export async function getReport(
-  sessionId: string,
-): Promise<EvaluationReport | null> {
+export type ReportResult =
+  | { status: 'ready'; report: EvaluationReport }
+  | { status: 'pending' }
+  | { status: 'failed' };
+
+/** 200 -> ready, 404 -> still generating, 502 -> generation failed (retryable). */
+export async function getReport(sessionId: string): Promise<ReportResult> {
   const res = await fetch(`${BACKEND_URL}/api/report/${sessionId}`);
-  if (res.status === 404) return null;
+  if (res.status === 404) return { status: 'pending' };
+  if (res.status === 502) return { status: 'failed' };
   if (!res.ok) throw new Error('Failed to fetch report');
-  return res.json();
+  return { status: 'ready', report: await res.json() };
+}
+
+export async function retryReport(sessionId: string): Promise<void> {
+  const res = await fetch(`${BACKEND_URL}/api/report/${sessionId}/retry`, {
+    method: 'POST',
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(
+      typeof err.detail === 'string' ? err.detail : 'Could not retry the report',
+    );
+  }
 }

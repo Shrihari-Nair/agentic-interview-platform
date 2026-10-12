@@ -2,7 +2,31 @@ import json
 import os
 from google import genai
 from google.genai import types
+from backend.services.llm_retry import retry_async
 from backend.services.tracing import traced_generation
+
+VALID_RECOMMENDATIONS = {"strong_yes", "yes", "maybe", "no"}
+_REQUIRED_KEYS = ("overall_score", "hiring_recommendation", "category_scores")
+
+
+def validate_report(report: dict) -> dict:
+    """The frontend indexes straight into these fields, so a malformed report
+    must fail here (and be retried) rather than crash the report page."""
+    if not isinstance(report, dict):
+        raise ValueError("report is not a JSON object")
+    missing = [k for k in _REQUIRED_KEYS if k not in report]
+    if missing:
+        raise ValueError(f"report missing keys: {missing}")
+    if report["hiring_recommendation"] not in VALID_RECOMMENDATIONS:
+        raise ValueError(f"invalid hiring_recommendation: {report['hiring_recommendation']!r}")
+    if not isinstance(report["category_scores"], dict):
+        raise ValueError("category_scores must be an object")
+    report["overall_score"] = float(report["overall_score"])
+    report.setdefault("summary", "")
+    report.setdefault("strengths", [])
+    report.setdefault("improvements", [])
+    report.setdefault("question_feedback", [])
+    return report
 
 REPORT_PROMPT = """
 You are an expert interview evaluator. Analyze this mock interview session thoroughly.
@@ -46,6 +70,14 @@ Return ONLY the JSON object — no markdown fences, no explanation.
 
 
 async def generate_report(session_id: str, plan: dict, transcript: list) -> dict:
+    return await retry_async(
+        lambda: _generate_report_once(session_id, plan, transcript),
+        attempts=3,
+        label="report_generation",
+    )
+
+
+async def _generate_report_once(session_id: str, plan: dict, transcript: list) -> dict:
     client = genai.Client(api_key=os.environ["GOOGLE_API_KEY"])
 
     prompt = REPORT_PROMPT.format(
@@ -73,4 +105,4 @@ async def generate_report(session_id: str, plan: dict, transcript: list) -> dict
                 raw = raw[4:]
             raw = raw.strip()
 
-        return json.loads(raw)
+        return validate_report(json.loads(raw))

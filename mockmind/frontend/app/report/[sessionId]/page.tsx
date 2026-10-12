@@ -2,8 +2,8 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { BarChart3, CheckCircle2, Target, RotateCcw } from 'lucide-react';
-import { getReport } from '../../../lib/api';
+import { BarChart3, CheckCircle2, Target, RotateCcw, Printer, AlertTriangle, RefreshCw } from 'lucide-react';
+import { getReport, retryReport } from '../../../lib/api';
 import type { EvaluationReport } from '../../../types/interview';
 import { AuroraBackground } from '../../../components/AuroraBackground';
 
@@ -30,9 +30,9 @@ function ScoreBar({ label, score }: { label: string; score: number }) {
         </span>
         <span className="font-semibold text-white">{score.toFixed(1)}</span>
       </div>
-      <div className="h-2.5 bg-white/10 rounded-full overflow-hidden">
+      <div className="h-2.5 bg-white/10 rounded-full overflow-hidden print:border print:border-slate-300">
         <div
-          className={`h-full bg-gradient-to-r ${gradient} rounded-full transition-all duration-700`}
+          className={`print-keep h-full bg-gradient-to-r ${gradient} rounded-full transition-all duration-700`}
           style={{ width: `${pct}%` }}
         />
       </div>
@@ -46,12 +46,18 @@ export default function ReportPage() {
   const [report, setReport] = useState<EvaluationReport | null>(null);
   const [polling, setPolling] = useState(true);
   const [pollCount, setPollCount] = useState(0);
+  const [failed, setFailed] = useState(false);
+  const [retrying, setRetrying] = useState(false);
+  const [retryError, setRetryError] = useState<string | null>(null);
 
   const fetchReport = useCallback(async () => {
     try {
-      const data = await getReport(sessionId);
-      if (data) {
-        setReport(data);
+      const result = await getReport(sessionId);
+      if (result.status === 'ready') {
+        setReport(result.report);
+        setPolling(false);
+      } else if (result.status === 'failed') {
+        setFailed(true);
         setPolling(false);
       }
     } catch {
@@ -76,9 +82,59 @@ export default function ReportPage() {
     return () => clearTimeout(timer);
   }, [polling, pollCount, fetchReport]);
 
+  const handleRetry = async () => {
+    setRetrying(true);
+    setRetryError(null);
+    try {
+      await retryReport(sessionId);
+      setFailed(false);
+      setPollCount(0);
+      setPolling(true);
+    } catch (e) {
+      setRetryError((e as Error).message);
+    } finally {
+      setRetrying(false);
+    }
+  };
+
   const recommendation = report
     ? RECOMMENDATION_CONFIG[report.hiring_recommendation]
     : null;
+
+  if (!report && failed) {
+    return (
+      <div className="relative min-h-screen overflow-hidden flex items-center justify-center">
+        <AuroraBackground subtle />
+        <div className="relative z-10 text-center space-y-4 max-w-sm p-8">
+          <AlertTriangle className="w-12 h-12 mx-auto text-amber-400" />
+          <h2 className="font-display text-2xl font-bold text-white">
+            We couldn&apos;t generate your report
+          </h2>
+          <p className="text-slate-400">
+            Your interview was saved. This is usually a temporary problem — try
+            again.
+          </p>
+          {retryError && <p className="text-red-400 text-sm">{retryError}</p>}
+          <div className="flex gap-3 justify-center">
+            <button
+              onClick={handleRetry}
+              disabled={retrying}
+              className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-cyan-500 disabled:opacity-60 text-white font-semibold rounded-xl transition-all duration-300 hover:scale-[1.03] active:scale-[0.98]"
+            >
+              <RefreshCw className={`w-4 h-4 ${retrying ? 'animate-spin' : ''}`} />
+              Try again
+            </button>
+            <button
+              onClick={() => router.push('/setup')}
+              className="px-5 py-2.5 border border-white/15 text-slate-300 rounded-xl hover:bg-white/5 transition-colors"
+            >
+              New interview
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!report) {
     return (
@@ -97,9 +153,18 @@ export default function ReportPage() {
           </div>
           {!polling && pollCount >= 30 && (
             <p className="text-red-400 text-sm">
-              Report is taking longer than expected. Please refresh the page in
-              a moment.
+              Report is taking longer than expected.
             </p>
+          )}
+          {retryError && <p className="text-red-400 text-sm">{retryError}</p>}
+          {!polling && pollCount >= 30 && (
+            <button
+              onClick={handleRetry}
+              disabled={retrying}
+              className="px-4 py-2 border border-white/15 text-slate-200 rounded-xl text-sm hover:bg-white/5 disabled:opacity-60"
+            >
+              {retrying ? 'Retrying...' : 'Try again'}
+            </button>
           )}
         </div>
       </div>
@@ -107,21 +172,30 @@ export default function ReportPage() {
   }
 
   return (
-    <main className="relative min-h-screen overflow-hidden py-10 px-4">
-      <AuroraBackground subtle />
+    <main className="report-root relative min-h-screen overflow-hidden py-10 px-4">
+      <div className="print:hidden"><AuroraBackground subtle /></div>
 
       <div className="relative z-10 max-w-3xl mx-auto space-y-6">
         {/* Header */}
-        <div className="flex items-center justify-between animate-fade-in-up">
+        <div className="flex flex-wrap items-center justify-between gap-3 animate-fade-in-up">
           <h1 className="font-display text-3xl font-bold text-white">
             Interview Report
           </h1>
-          <button
-            onClick={() => router.push('/setup')}
-            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white text-sm font-semibold rounded-xl transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] shadow-lg shadow-blue-600/20"
-          >
-            <RotateCcw className="w-4 h-4" /> New Interview
-          </button>
+          <div className="flex gap-2 print:hidden">
+            <button
+              onClick={() => window.print()}
+              className="flex items-center gap-2 px-4 py-2 border border-white/15 text-slate-200 text-sm font-semibold rounded-xl hover:bg-white/10 transition-colors"
+              title="Opens the print dialog — choose “Save as PDF”"
+            >
+              <Printer className="w-4 h-4" /> Save as PDF
+            </button>
+            <button
+              onClick={() => router.push('/setup')}
+              className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 text-white text-sm font-semibold rounded-xl transition-all duration-300 hover:scale-[1.03] active:scale-[0.98] shadow-lg shadow-blue-600/20"
+            >
+              <RotateCcw className="w-4 h-4" /> New Interview
+            </button>
+          </div>
         </div>
 
         {/* Overall Score + Recommendation */}
@@ -174,7 +248,7 @@ export default function ReportPage() {
               <CheckCircle2 className="w-5 h-5" /> Strengths
             </h3>
             <ul className="space-y-2">
-              {report.strengths.map((s, i) => (
+              {(report.strengths ?? []).map((s, i) => (
                 <li key={i} className="text-sm text-slate-300 flex gap-2">
                   <span className="text-emerald-400 mt-0.5 shrink-0">•</span>
                   <span>{s}</span>
@@ -187,7 +261,7 @@ export default function ReportPage() {
               <Target className="w-5 h-5" /> Areas to Improve
             </h3>
             <ul className="space-y-2">
-              {report.improvements.map((s, i) => (
+              {(report.improvements ?? []).map((s, i) => (
                 <li key={i} className="text-sm text-slate-300 flex gap-2">
                   <span className="text-amber-400 mt-0.5 shrink-0">•</span>
                   <span>{s}</span>
@@ -205,7 +279,7 @@ export default function ReportPage() {
           <h3 className="font-display font-bold text-white text-lg">
             Question-by-Question Feedback
           </h3>
-          {report.question_feedback.map((qf, i) => {
+          {(report.question_feedback ?? []).map((qf, i) => {
             const qScore = qf.score;
             const scoreColor =
               qScore >= 7
@@ -239,7 +313,7 @@ export default function ReportPage() {
                   </div>
                 )}
                 <p className="text-sm text-slate-400">{qf.feedback}</p>
-                {qf.missed_points.length > 0 && (
+                {(qf.missed_points?.length ?? 0) > 0 && (
                   <div>
                     <p className="text-xs font-semibold text-slate-500 mb-1">
                       Could have mentioned:

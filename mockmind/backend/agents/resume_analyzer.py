@@ -6,6 +6,7 @@ from google import genai
 from google.genai import types
 from backend.models.interview_plan import CandidateProfile
 from backend.services.tracing import traced_generation
+from backend.services.llm_retry import retry_async
 
 logger = logging.getLogger(__name__)
 
@@ -44,7 +45,7 @@ Return ONLY the JSON object — no markdown fences, no explanation.
 """
 
 
-async def analyze_resume(resume_text: str, session_id: str = "unknown") -> CandidateProfile:
+async def _analyze_resume_once(resume_text: str, session_id: str = "unknown") -> CandidateProfile:
     client = genai.Client(api_key=os.environ["GOOGLE_API_KEY"])
 
     prompt = RESUME_ANALYSIS_PROMPT + "\n\nRESUME TEXT:\n" + resume_text
@@ -69,3 +70,7 @@ async def analyze_resume(resume_text: str, session_id: str = "unknown") -> Candi
             logger.error("resume_analyzer JSON parse failed. Raw response (first 500 chars):\n%s", raw[:500])
             raise
         return CandidateProfile(**data)
+
+
+async def analyze_resume(resume_text: str, session_id: str = "unknown") -> CandidateProfile:
+    return await retry_async(lambda: _analyze_resume_once(resume_text, session_id), label="resume_analysis")

@@ -242,6 +242,21 @@ async def entrypoint(ctx: JobContext) -> None:
         if getattr(event, "is_final", True) and getattr(event, "transcript", None):
             state.add_transcript_entry("candidate", event.transcript)
 
+    # Record the interviewer's own turns too — the report generator needs the
+    # follow-ups and reactions, not just the candidate's side.
+    @session.on("conversation_item_added")
+    def on_item_added(event):
+        item = event.item
+        if getattr(item, "role", None) != "assistant":
+            return
+        text = (getattr(item, "text_content", None) or "").strip()
+        if not text:
+            return
+        last = state.transcript[-1] if state.transcript else None
+        if last and last["speaker"] == "interviewer" and last["text"].strip() == text:
+            return  # already recorded (e.g. the opening line added in on_enter)
+        state.add_transcript_entry("interviewer", text)
+
     # ── Live-coding: candidate code submissions arrive over a LiveKit data
     # message (not HTTP) — see frontend's useDataChannel("code_submission").
     @ctx.room.on("data_received")

@@ -21,10 +21,10 @@ export function CodeEditorPanel({
   const [code, setCode] = useState(challenge.starter_code);
 
   return (
-    <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4">
-      <div className="w-full max-w-4xl h-[85vh] bg-slate-900/95 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-fade-in-up">
+    <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/70 backdrop-blur-sm p-2 sm:p-4">
+      <div className="w-full max-w-4xl h-[92dvh] sm:h-[85vh] bg-slate-900/95 backdrop-blur-xl border border-white/10 rounded-3xl shadow-2xl flex flex-col overflow-hidden animate-fade-in-up">
         {/* Header */}
-        <div className="flex items-center gap-2 px-6 py-4 border-b border-white/10 shrink-0">
+        <div className="flex items-center gap-2 px-4 sm:px-6 py-4 border-b border-white/10 shrink-0">
           <Code2 className="w-5 h-5 text-blue-400" />
           <h2 className="font-display text-lg font-bold text-white">Live Coding Question</h2>
           <span className="ml-auto text-xs text-slate-500 uppercase tracking-wide">
@@ -33,7 +33,7 @@ export function CodeEditorPanel({
         </div>
 
         {/* Problem statement */}
-        <div className="px-6 py-4 border-b border-white/10 shrink-0 max-h-40 overflow-y-auto">
+        <div className="px-4 sm:px-6 py-4 border-b border-white/10 shrink-0 max-h-40 overflow-y-auto">
           <p className="text-sm text-slate-300 leading-relaxed whitespace-pre-wrap">
             {challenge.problem_statement}
           </p>
@@ -57,7 +57,7 @@ export function CodeEditorPanel({
         </div>
 
         {/* Footer */}
-        <div className="flex items-center justify-between px-6 py-4 border-t border-white/10 shrink-0">
+        <div className="flex flex-wrap items-center justify-between gap-3 px-4 sm:px-6 py-4 border-t border-white/10 shrink-0">
           <p className="text-xs text-slate-500">
             Submit when ready — Alex will review it and react out loud.
           </p>

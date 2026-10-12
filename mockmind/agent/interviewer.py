@@ -3,10 +3,10 @@ import json
 import logging
 import time
 
-from livekit.agents import Agent, RunContext, function_tool, get_job_context
+from livekit.agents import Agent, RunContext, function_tool, get_job_context, llm
 
 from agent.prompts import build_interviewer_system_prompt
-from agent.session_state import AgentSessionState, generate_and_store_report
+from agent.session_state import MAX_FOLLOW_UPS, AgentSessionState, generate_and_store_report
 from backend.models.interview_plan import InterviewQuestion
 
 logger = logging.getLogger(__name__)
@@ -62,6 +62,28 @@ class InterviewerAgent(Agent):
         except Exception:
             logger.exception("on_enter: error while speaking opening message")
 
+    async def on_user_turn_completed(
+        self, turn_ctx: llm.ChatContext, new_message: llm.ChatMessage
+    ) -> None:
+        """Enforces the follow-up cap in code. The interviewer prompt asks for
+        at most MAX_FOLLOW_UPS follow-ups, but an instruction alone is a request,
+        not a guarantee: here we count candidate turns per question and tell the
+        LLM, on every turn, exactly where it stands."""
+        state = self._state
+        q = state.current_question
+        if q is None or q.question_type == "coding":
+            return
+        used = state.record_candidate_turn()
+        if state.follow_up_cap_reached:
+            note = (
+                f"[system note] Follow-ups used on this question: {used}/{MAX_FOLLOW_UPS}. "
+                "The limit is reached: do NOT ask another follow-up. Briefly acknowledge "
+                "the candidate's answer, then call move_to_next_question."
+            )
+        else:
+            note = f"[system note] Follow-ups used on this question: {used}/{MAX_FOLLOW_UPS}."
+        turn_ctx.add_message(role="system", content=note)
+
     @function_tool()
     async def move_to_next_question(self, context: RunContext) -> str:
         """
@@ -115,7 +137,7 @@ class InterviewerAgent(Agent):
                 for fu in q.follow_ups
             ],
             "follow_ups_used_this_question": state.follow_up_count_this_question,
-            "max_follow_ups": 2,
+            "max_follow_ups": MAX_FOLLOW_UPS,
         })
 
     @function_tool()
@@ -162,5 +184,5 @@ class InterviewerAgent(Agent):
                 for fu in q.follow_ups
             ],
             "follow_ups_used_this_question": state.follow_up_count_this_question,
-            "max_follow_ups": 2,
+            "max_follow_ups": MAX_FOLLOW_UPS,
         })

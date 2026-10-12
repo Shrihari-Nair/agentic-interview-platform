@@ -4,6 +4,12 @@ import type { PrepProgressEvent, SessionInfo } from '../types/interview';
 const BACKEND_URL =
   process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:8000';
 
+export interface PrepOptions {
+  difficulty: 'easier' | 'balanced' | 'harder';
+  length: 'quick' | 'standard';
+  focusWeakAreas: boolean;
+}
+
 export function usePreparation() {
   const [events, setEvents] = useState<PrepProgressEvent[]>([]);
   const [currentProgress, setCurrentProgress] = useState(0);
@@ -19,6 +25,7 @@ export function usePreparation() {
       useMemory: boolean = false,
       candidateEmail: string = '',
       interviewType: 'standard' | 'coding' = 'standard',
+      options: PrepOptions = { difficulty: 'balanced', length: 'standard', focusWeakAreas: false },
     ) => {
       setIsRunning(true);
       setEvents([]);
@@ -31,6 +38,9 @@ export function usePreparation() {
       formData.append('job_description', jobDescription);
       formData.append('use_memory', String(useMemory));
       formData.append('interview_type', interviewType);
+      formData.append('difficulty', options.difficulty);
+      formData.append('length', options.length);
+      formData.append('focus_weak_areas', String(options.focusWeakAreas));
       if (useMemory && candidateEmail.trim()) {
         formData.append('candidate_email', candidateEmail.trim());
       }

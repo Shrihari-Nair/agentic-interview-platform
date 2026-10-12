@@ -6,6 +6,7 @@ from google import genai
 from google.genai import types
 from backend.models.interview_plan import JobProfile
 from backend.services.tracing import traced_generation
+from backend.services.llm_retry import retry_async
 
 logger = logging.getLogger(__name__)
 
@@ -40,7 +41,7 @@ Return ONLY the JSON object — no markdown fences, no explanation.
 """
 
 
-async def analyze_jd(jd_text: str, session_id: str = "unknown") -> JobProfile:
+async def _analyze_jd_once(jd_text: str, session_id: str = "unknown") -> JobProfile:
     client = genai.Client(api_key=os.environ["GOOGLE_API_KEY"])
 
     prompt = JD_ANALYSIS_PROMPT + "\n\nJOB DESCRIPTION:\n" + jd_text
@@ -65,3 +66,7 @@ async def analyze_jd(jd_text: str, session_id: str = "unknown") -> JobProfile:
             logger.error("jd_analyzer JSON parse failed. Raw response (first 500 chars):\n%s", raw[:500])
             raise
         return JobProfile(**data)
+
+
+async def analyze_jd(jd_text: str, session_id: str = "unknown") -> JobProfile:
+    return await retry_async(lambda: _analyze_jd_once(jd_text, session_id), label="jd_analysis")

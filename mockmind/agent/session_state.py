@@ -1,4 +1,5 @@
-import json
+import asyncio
+import logging
 import os
 import time
 from typing import Optional
@@ -6,6 +7,12 @@ from typing import Optional
 import redis.asyncio as redis
 
 from backend.models.interview_plan import InterviewPlan, SessionState
+
+logger = logging.getLogger("mockmind_agent")
+
+MAX_FOLLOW_UPS = 2
+# Transcript autosave: coalesce bursts of entries into one Redis write.
+_AUTOSAVE_DELAY_S = 1.0
 
 
 class AgentSessionState:
@@ -15,9 +22,11 @@ class AgentSessionState:
         self.current_question_index = 0
         self.asked_question_ids: list[str] = []
         self.follow_up_count_this_question = 0
+        self.candidate_turns_this_question = 0
         self.transcript: list[dict] = []
         self.started_at = time.time()
         self.ended_at: Optional[float] = None
+        self._autosave_task: Optional[asyncio.Task] = None
 
     @classmethod
     async def load(cls, session_id: str) -> "AgentSessionState":
@@ -55,6 +64,7 @@ class AgentSessionState:
             self.asked_question_ids.append(q.id)
         self.current_question_index += 1
         self.follow_up_count_this_question = 0
+        self.candidate_turns_this_question = 0
 
     def add_transcript_entry(self, speaker: str, text: str):
         self.transcript.append({
@@ -63,9 +73,41 @@ class AgentSessionState:
             "timestamp": time.time(),
             "question_index": self.current_question_index,
         })
+        self._schedule_autosave()
 
     def increment_follow_up_count(self):
         self.follow_up_count_this_question += 1
+
+    def record_candidate_turn(self) -> int:
+        """Called once per completed candidate turn. The first turn on a
+        question answers it; every later turn answers a follow-up. Counting
+        this in code (not trusting the LLM to count) is what enforces the cap."""
+        self.candidate_turns_this_question += 1
+        self.follow_up_count_this_question = max(0, self.candidate_turns_this_question - 1)
+        return self.follow_up_count_this_question
+
+    @property
+    def follow_up_cap_reached(self) -> bool:
+        return self.follow_up_count_this_question >= MAX_FOLLOW_UPS
+
+    def _schedule_autosave(self):
+        """Persist the transcript to Redis shortly after it changes, so an
+        agent crash mid-interview no longer loses the whole interview (the
+        report can then still be generated/retried from Redis)."""
+        try:
+            loop = asyncio.get_running_loop()
+        except RuntimeError:
+            return  # no event loop (e.g. sync unit tests) — shutdown hook still saves
+        if self._autosave_task and not self._autosave_task.done():
+            return
+        self._autosave_task = loop.create_task(self._autosave())
+
+    async def _autosave(self):
+        await asyncio.sleep(_AUTOSAVE_DELAY_S)
+        try:
+            await self.save()
+        except Exception:
+            logger.exception("Transcript autosave failed for session %s", self.session_id)
 
     async def save(self):
         r = redis.from_url(
@@ -94,51 +136,22 @@ class AgentSessionState:
 
 async def generate_and_store_report(state: AgentSessionState):
     """
-    Background coroutine: generate the post-interview report and store it in Redis.
-    Called either by the end_interview tool or the session shutdown callback.
+    Generate the post-interview report and store it in Redis (with a
+    pending/ready/failed status). Called by the end_interview tool or the
+    session shutdown callback. Never raises — see run_report_pipeline.
     """
-    import json
-    import redis.asyncio as redis_mod
-    from backend.services.report_generator import generate_report
+    from backend.services.report_pipeline import run_report_pipeline
 
+    # Persist the final transcript first so POST /api/report/{id}/retry can
+    # regenerate the report even if generation below fails.
     try:
-        report = await generate_report(
-            session_id=state.session_id,
-            plan=state.plan.model_dump(),
-            transcript=state.transcript,
-        )
-        r = redis_mod.from_url(
-            os.getenv("REDIS_URL", "redis://localhost:6379"),
-            encoding="utf-8",
-            decode_responses=True,
-        )
-        try:
-            await r.setex(
-                f"interview_report:{state.session_id}",
-                86400,
-                json.dumps(report),
-            )
-        finally:
-            await r.aclose()
-    except Exception as e:
-        import logging
-        logging.getLogger("mockmind_agent").error(f"Report generation failed: {e}")
-        return
+        await state.save()
+    except Exception:
+        logger.exception("Final state save failed for session %s", state.session_id)
 
-    if state.plan.candidate_email:
-        try:
-            from backend.services.memory_store import get_memory, save_memory
-            from backend.services.memory_updater import update_memory_from_report
-
-            existing = await get_memory(state.plan.candidate_email)
-            updated = await update_memory_from_report(
-                existing=existing,
-                email=state.plan.candidate_email,
-                session_id=state.session_id,
-                plan=state.plan.model_dump(),
-                report=report,
-            )
-            await save_memory(updated)
-        except Exception as e:
-            import logging
-            logging.getLogger("mockmind_agent").error(f"Candidate memory update failed: {e}")
+    await run_report_pipeline(
+        state.session_id,
+        state.plan.model_dump(),
+        state.transcript,
+        state.plan.candidate_email,
+    )
