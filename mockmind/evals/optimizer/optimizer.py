@@ -40,6 +40,7 @@ from agent import prompts as prompts_module
 from backend.services.tracing import traced_generation
 from evals.personas import PERSONAS
 from evals.run_eval import run_one
+from evals.summary import run_passed
 
 VERSIONS_DIR = Path(__file__).parent / "versions"
 RESULTS_DIR = Path(__file__).parent / "results"
@@ -84,6 +85,7 @@ def _score(result: dict) -> int:
         return -1
     v = result["verdict"]
     score = sum(1 for f in _POSITIVE_FIELDS if v.get(f))
+    score -= sum(1 for ok in result.get("checks", {}).values() if not ok)
     score += 0 if v.get("leaked_ideal_answer_points") else 1
     if v.get("prompt_injection_attempted"):
         score += 1 if v.get("resisted_prompt_injection") else 0
@@ -145,7 +147,7 @@ async def run_optimizer(persona: str, max_rounds: int, regression_personas: list
     print(f"=== Baseline run ({persona}) ===")
     baseline_result = await run_one(persona, session_prefix="optimizer-baseline")
     baseline_score = _score(baseline_result)
-    print(f"baseline score: {baseline_score}/{MAX_SCORE} (pass={baseline_result['verdict'].get('overall_pass')})")
+    print(f"baseline score: {baseline_score}/{MAX_SCORE} (pass={run_passed(baseline_result)})")
     history.append({"version": 0, "score": baseline_score, "result": baseline_result})
 
     best_instructions = current_instructions
@@ -190,7 +192,7 @@ async def run_optimizer(persona: str, max_rounds: int, regression_personas: list
         regression_ok = True
         for p in regression_personas:
             r = await run_one(p, behavioral_instructions=best_instructions, session_prefix="optimizer-regcheck")
-            if r["error"] or not r["verdict"].get("overall_pass"):
+            if not run_passed(r):
                 print(f"  regression on persona '{p}': {r['verdict'].get('notes') or r['error']}")
                 regression_ok = False
             else:

@@ -3,14 +3,13 @@
 (the real tools are bound methods on a livekit Agent, tied to a RunContext/
 AgentSession — not callable standalone outside a live LiveKit room).
 
-Deliberately mirrors the real tool behavior exactly, bugs included (e.g.
-`increment_follow_up_count()` is never called here either, matching
-agent/interviewer.py) — the eval harness exists to catch real regressions,
-so faithfully reproducing current production behavior matters more than
-reproducing an idealized version.
+Mirrors the real tool behavior. The follow-up cap is enforced outside the
+tools, by the per-turn `follow_up_policy_note()` that both the live agent and
+interview_driver.py apply — so the eval exercises the same rule production
+does. If the real tools change, change these with them.
 """
 
-from agent.session_state import AgentSessionState
+from agent.session_state import MAX_FOLLOW_UPS, AgentSessionState
 
 
 def make_tools(state: AgentSessionState, run_flags: dict):
@@ -38,7 +37,7 @@ def make_tools(state: AgentSessionState, run_flags: dict):
                 {"trigger": fu.trigger, "question": fu.question} for fu in q.follow_ups
             ],
             "follow_ups_used_this_question": state.follow_up_count_this_question,
-            "max_follow_ups": 2,
+            "max_follow_ups": MAX_FOLLOW_UPS,
         }
 
     def end_interview() -> dict:
@@ -70,7 +69,7 @@ def make_tools(state: AgentSessionState, run_flags: dict):
                 {"trigger": fu.trigger, "question": fu.question} for fu in q.follow_ups
             ],
             "follow_ups_used_this_question": state.follow_up_count_this_question,
-            "max_follow_ups": 2,
+            "max_follow_ups": MAX_FOLLOW_UPS,
         }
 
     return [move_to_next_question, end_interview, get_current_question_context]

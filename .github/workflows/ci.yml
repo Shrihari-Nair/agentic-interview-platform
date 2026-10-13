@@ -16,6 +16,16 @@ jobs:
   backend:
     name: Backend + agent tests
     runs-on: ubuntu-latest
+    services:
+      # Real Redis for the API-level smoke test (prepare -> token -> report -> retry).
+      redis:
+        image: redis:7-alpine
+        ports: ["6379:6379"]
+        options: >-
+          --health-cmd "redis-cli ping" --health-interval 5s
+          --health-timeout 3s --health-retries 10
+    env:
+      REDIS_URL: redis://localhost:6379
     defaults:
       run:
         working-directory: mockmind
@@ -33,9 +43,10 @@ jobs:
           # Core LiveKit Agents only (no STT/TTS plugins) — enough to import the
           # interviewer agent for the follow-up-cap tests.
           pip install "livekit-agents~=1.5" pytest httpx
-      # No Redis, network or API keys needed: tests use an in-memory fake Redis
-      # and stub the LLM. Script-style tests that need real services only run
-      # under __main__, so pytest just collects them.
+      # No API keys needed: the LLM is always stubbed. Unit tests use an
+      # in-memory fake Redis; test_api_smoke.py uses the real Redis service
+      # above. Script-style tests that need real services only run under
+      # __main__, so pytest just collects them.
       - name: Run tests
         run: python -m pytest backend/tests -q
 

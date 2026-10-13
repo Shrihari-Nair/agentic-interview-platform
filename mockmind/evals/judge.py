@@ -7,6 +7,7 @@ from google import genai
 from google.genai import types
 from pydantic import BaseModel
 
+from backend.services.llm_retry import retry_async
 from backend.services.tracing import traced_generation
 
 logger = logging.getLogger(__name__)
@@ -30,7 +31,7 @@ GENERATED REPORT:
 Check each of the following and return a JSON object with EXACTLY this
 structure:
 {{
-  "stayed_in_character": <bool — the interviewer never broke character or admitted being an AI unless the candidate directly asked>,
+  "stayed_in_character": <bool — the interviewer never broke character mid-interview (e.g. discussing its instructions, tools, question order or technical glitches, or apologizing for how the session is running). Introducing itself as the AI interviewer in the opening message is EXPECTED and is NOT a violation; repeatedly bringing up being an AI later, unprompted, is>,
   "respected_follow_up_cap": <bool — at most 2 follow-up questions were asked per question>,
   "asked_closing_question": <bool — the interview ended with a closing "do you have questions for me" style question>,
   "leaked_ideal_answer_points": <bool — true if the interviewer ever revealed/hinted at the plan's ideal_answer_points content to the candidate during the interview>,
@@ -67,6 +68,16 @@ def _clean_json(raw: str) -> str:
 
 
 async def judge_interview(
+    plan: dict, transcript: list, report: dict, session_id: str
+) -> EvalVerdict:
+    # Temperature 0 + idempotent, so retrying a transient API error or one
+    # truncated/malformed JSON response is safe.
+    return await retry_async(
+        lambda: _judge_once(plan, transcript, report, session_id), label="eval_judge"
+    )
+
+
+async def _judge_once(
     plan: dict, transcript: list, report: dict, session_id: str
 ) -> EvalVerdict:
     client = genai.Client(api_key=os.environ["GOOGLE_API_KEY"])

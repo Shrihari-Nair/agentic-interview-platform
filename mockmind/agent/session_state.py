@@ -134,6 +134,27 @@ class AgentSessionState:
             await r.aclose()
 
 
+def follow_up_policy_note(state: AgentSessionState) -> str | None:
+    """The per-turn follow-up policy, shared by the live agent
+    (InterviewerAgent.on_user_turn_completed) and the text-mode eval driver so
+    the eval exercises the exact rule production enforces.
+
+    Call once per completed candidate turn: it counts the turn and returns the
+    note to show the LLM (None for coding questions, which are driven by code
+    submissions rather than spoken follow-ups)."""
+    q = state.current_question
+    if q is None or q.question_type == "coding":
+        return None
+    used = state.record_candidate_turn()
+    if state.follow_up_cap_reached:
+        return (
+            f"[system note] Follow-ups used on this question: {used}/{MAX_FOLLOW_UPS}. "
+            "The limit is reached: do NOT ask another follow-up. Briefly acknowledge "
+            "the candidate's answer, then call move_to_next_question."
+        )
+    return f"[system note] Follow-ups used on this question: {used}/{MAX_FOLLOW_UPS}."
+
+
 async def generate_and_store_report(state: AgentSessionState):
     """
     Generate the post-interview report and store it in Redis (with a
